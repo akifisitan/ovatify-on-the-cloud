@@ -1,4 +1,9 @@
 # <img src="https://opentelemetry.io/img/logos/opentelemetry-logo-nav.png" alt="OTel logo" width="45"> CS436 Term Project - Open Telemetry
+Mehmet Enes Onuş 29353
+
+Akif Işıtan 29354
+
+Bilal Berkam Dertli 29267
 
 ## Project Overview
 
