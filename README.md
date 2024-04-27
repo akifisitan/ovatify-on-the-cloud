@@ -5,6 +5,8 @@ Akif Işıtan 29354
 
 Bilal Berkam Dertli 29267
 
+Abdulrahman Yunis 30526
+
 ## Project Overview
 
 This project is a collaborative effort aimed at exploring the benefits and functionalities of cloud-native applications. By leveraging OpenTelemetry's demo project, we gain insights into service orchestration, scalability, and the observability of microservices. The demo includes a variety of services, each running in its container, and utilizes tools like Locust for load generation, as well as Jaeger and Grafana for observability.
