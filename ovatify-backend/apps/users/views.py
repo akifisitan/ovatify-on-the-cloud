@@ -1,6 +1,7 @@
 import json
 import logging
 import tempfile
+import uuid
 from collections import Counter
 from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
@@ -37,8 +38,10 @@ from users.utils import (get_recommendations,
 from spotipy.oauth2 import SpotifyClientCredentials
 import os
 import random
+from django.contrib.auth.hashers import check_password
 
 # Create endpoints
+
 
 @csrf_exempt
 @token_required
@@ -77,40 +80,47 @@ def return_post_body(request, userid):
 
 
 @csrf_exempt
-@token_required
-def login(request, userid):
-    if request.method != 'PUT':
-        return HttpResponse(status=405)
-    try:
-        #get the user from the database
-        user = User.objects.get(id=userid)
-        user.last_login = timezone.now()
-        user.save()
-    except Exception as e:
-        return JsonResponse({"error": "Database error"}, status=500)
-    return JsonResponse({}, status=200)
-
-
-@csrf_exempt
-@token_required
-def create_user(request, userid):
+def login(request):
     if request.method != 'POST':
         return HttpResponse(status=405)
     try:
         data = json.loads(request.body.decode('utf-8'))
         email: str = data.get('email')
-        #return the email in the response
-        if email is None:  # if email is not provided
-            return HttpResponse(status=400)
+        password: str = data.get('password')
+        user = User.objects.get(email=email)
+        if not check_password(password, user.password):
+            return JsonResponse({"error": "Invalid credentials"}, status=401)
+        user.last_login = timezone.now()
+        user.save()
+        return JsonResponse({"access" : user.id, "refresh": ""}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def create_user(request):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+        email: str = data.get('email')
+        password: str = data.get('password')
+        username: str = data.get('username')
+        if not email or not password or not username:
+            return JsonResponse({"error": "Missing fields"}, status=400)
         if User.objects.filter(email=email).exists():  # if user already exists
-            return HttpResponse(status=400)
-        random_username: str = email.split('@')[0][:6] + str(datetime.now().timestamp()).split('.')[0]
-        user = User.objects.create(id=userid, username=random_username, email=email, last_login=timezone.now())
+            return JsonResponse({"error": "Email already in use"}, status=400)
+        userid: str = str(uuid.uuid4())
+        user = User(id=userid, username=username, email=email, last_login=timezone.now())
+
+        user.set_password(password)
+        user.save()
         if not UserPreferences.objects.filter(user=user).exists():
             UserPreferences.objects.create(user=user, data_processing_consent=True, data_sharing_consent=True)
         return HttpResponse(status=201)
     except Exception as e:
-        #TODO logging.("create_user: " + str(e))
         return JsonResponse({'error': str(e)}, status=500)
 
 

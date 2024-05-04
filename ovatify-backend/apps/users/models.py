@@ -1,14 +1,16 @@
+import uuid
+
 from django.db import models
 from django.utils import timezone
 from OVTF_Backend.models import CoreModel
 
 from songs.models import Song
+from django.contrib.auth.hashers import make_password
 
 
-# Models
 class User(CoreModel):
-    id = models.CharField(max_length=200, primary_key=True)
-
+    id = models.CharField(primary_key=True)
+    password = models.CharField(max_length=150, default="password")
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     img_url = models.URLField(max_length=300, blank=True, null=True)
@@ -25,6 +27,9 @@ class User(CoreModel):
     def __str__(self):
         return str(self.username)
 
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+        self.save()
 
 class UserSongRating(CoreModel):
     id = models.AutoField(primary_key=True)
