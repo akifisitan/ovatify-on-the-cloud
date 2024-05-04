@@ -101,6 +101,7 @@ WSGI_APPLICATION = "OVTF_Backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+PG_NAME = os.getenv("DB_NAME")
 PG_USER = os.getenv("DB_USER")
 PG_PASSWORD = os.getenv("DB_PASSWORD")
 PG_HOST = os.getenv("DB_HOST")
@@ -109,7 +110,7 @@ PG_ENDPOINT = os.getenv("DB_ENDPOINT")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
+        "NAME": PG_NAME,
         "USER": PG_USER,
         "PASSWORD": PG_PASSWORD,
         "HOST": PG_HOST,
