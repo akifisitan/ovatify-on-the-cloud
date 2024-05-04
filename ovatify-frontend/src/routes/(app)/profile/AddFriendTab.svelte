@@ -3,7 +3,7 @@
 	import { Button } from "$lib/components/ui/button";
 	import { displayToast } from "$lib/utils/toast";
 	import { sendFriendRequest } from "$lib/services/friendService";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import { cn } from "$lib/utils";
 	import { sleep } from "$lib/utils/time";
 
@@ -23,7 +23,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await sendFriendRequest(token, username);
 		if (response.status === 200) {
 			displayToast({

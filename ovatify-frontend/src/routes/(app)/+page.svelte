@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { user } from "$lib/stores/user";
 	import SongCarousel from "$lib/components/SongCarousel.svelte";
 	import GenreCarousel from "$lib/components/GenreCarousel.svelte";
 	import DisplaySongModal from "$lib/components/DisplaySongModal.svelte";
@@ -20,13 +19,13 @@
 	let selectedSongId: string = "";
 
 	async function getRecentAdditions() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getAllRecentSongs(token);
 		return response;
 	}
 
 	async function getGenres() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getRandomSongGenres(token, 10);
 		return response;
 	}
@@ -39,7 +38,7 @@
 
 	onMount(async () => {
 		await sleep(1);
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getFriendSuggestionCount(token);
 		console.log(response);
 		if (response.status === 200) {

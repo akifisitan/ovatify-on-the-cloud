@@ -6,7 +6,7 @@
 	import FileUploadTab from "$lib/components/FileUploadTab.svelte";
 	import { fade } from "svelte/transition";
 	import { Button } from "$lib/components/ui/button";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import { exportSongsByArtist, exportSongsByGenre } from "$lib/services/userService";
 	import { cn } from "$lib/utils";
 	import ComboBox from "$lib/components/ComboBox.svelte";
@@ -25,7 +25,7 @@
 	}
 
 	async function getItems() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response =
 			name === "genre" ? await getUserGenreNames(token) : await getUserArtistNames(token);
 		if (response.status === 200) {
@@ -48,7 +48,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response =
 			name === "genre"
 				? await exportSongsByGenre(token, selectedItem)

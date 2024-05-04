@@ -2,21 +2,18 @@
 	import { displayToast, promiseToast } from "$lib/utils/toast";
 	import ManageFriendsModal from "./ManageFriendsModal.svelte";
 	import * as Avatar from "$lib/components/ui/avatar";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import {
 		getUserFriends,
 		getUserIncomingFriendRequestCount
 	} from "$lib/services/friendService";
 	import EditProfileModal from "./EditProfileModal.svelte";
 	import { getUserProfileStats } from "$lib/services/userService";
-	import { userData } from "$lib/stores/userData";
 	import { fade } from "svelte/transition";
 	import { Skeleton } from "$lib/components/ui/skeleton";
 	import { Pencil, UserPlus, Bell } from "lucide-svelte";
 	import { Button } from "$lib/components/ui/button";
 	import { Icons } from "$lib/icons";
-	import { sleep } from "$lib/utils/time";
-	import SpotifyProfileModal from "./SpotifyProfileModal.svelte";
 	import NotificationsModal from "./NotificationsModal.svelte";
 	import type { Friend } from "$lib/types";
 	import Spinner from "$lib/components/Spinner.svelte";
@@ -26,11 +23,10 @@
 	let refreshFriendCount = false;
 	let editProfileDialogOpen = false;
 	let manageFriendsDialogOpen = false;
-	let spotifyProfileDialogOpen = false;
 	let notificationsDialogOpen = false;
 
 	async function getPendingFriendRequestCount() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getUserIncomingFriendRequestCount(token);
 		if (response.status === 200) {
 			return response.data.count as number;
@@ -40,7 +36,7 @@
 	}
 
 	async function getUserStats() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getUserProfileStats(token);
 		if (response.status === 200) {
 			return response.data;
@@ -51,7 +47,7 @@
 	}
 
 	async function getAllFriends() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getUserFriends(token);
 		if (response.status !== 200) {
 			return [];
@@ -94,14 +90,6 @@
 		</div>
 		<div class="pt-2 sm:ml-auto sm:pr-2">
 			<div class="flex gap-2">
-				<Button
-					variant="outline"
-					class="p-0 w-10 h-10"
-					on:click={() => (spotifyProfileDialogOpen = true)}
-					><Icons.spotify class="h-6 w-6 sm:h-8 sm:w-8" /><span class="sr-only"
-						>Import to Spotify</span
-					></Button
-				>
 				<Button
 					variant="outline"
 					class="p-0 w-10 h-10"
@@ -181,7 +169,6 @@
 	bind:refreshFriendCount
 />
 <EditProfileModal bind:dialogOpen={editProfileDialogOpen} />
-<SpotifyProfileModal bind:dialogOpen={spotifyProfileDialogOpen} />
 <NotificationsModal bind:dialogOpen={notificationsDialogOpen} />
 
 <style lang="postcss">

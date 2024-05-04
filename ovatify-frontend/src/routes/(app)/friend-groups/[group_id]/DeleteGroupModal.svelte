@@ -3,7 +3,7 @@
 	import { page } from "$app/stores";
 	import * as Dialog from "$lib/components/ui/dialog";
 	import { deleteFriendGroup } from "$lib/services/groupService";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import { sleep } from "$lib/utils/time";
 	import { displayToast } from "$lib/utils/toast";
 	export let dialogOpen: boolean;
@@ -14,7 +14,7 @@
 	async function handleDeleteGroup() {
 		if (loading) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await deleteFriendGroup(token, $page.params.group_id);
 		console.log(response);
 		if (response.status === 204) {

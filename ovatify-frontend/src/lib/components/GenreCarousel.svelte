@@ -4,8 +4,8 @@
 	import { Skeleton } from "$lib/components/ui/skeleton";
 	import { fade } from "svelte/transition";
 	import ListSongsModal from "./ListSongsModal.svelte";
-	import { user } from "$lib/stores/user";
 	import { getSongsByGenreName } from "$lib/services/genreService";
+	import { userData } from "$lib/stores/userData";
 
 	export let title: string;
 	export let dataFunction: () => Promise<CarouselGenre[]>;
@@ -13,7 +13,7 @@
 	let selectedGenreName: string = "";
 
 	async function getSongsByGenreId() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getSongsByGenreName(token, 10, selectedGenreName);
 		return response;
 	}

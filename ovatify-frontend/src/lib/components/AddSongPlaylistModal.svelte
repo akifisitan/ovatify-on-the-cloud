@@ -4,7 +4,6 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Search } from "lucide-svelte";
 	import { displayToast } from "$lib/utils/toast";
-	import { user } from "$lib/stores/user";
 	import { fade } from "svelte/transition";
 	import { searchDatabaseSong } from "$lib/services/songService";
 	import { defaultImageUrl } from "$lib/constants";
@@ -14,6 +13,7 @@
 	import { addSongToPlaylist } from "$lib/services/playlistService";
 	import { createEventDispatcher } from "svelte";
 	import { deleteFromCache, playlistCache } from "$lib/utils/caches";
+	import { userData } from "$lib/stores/userData";
 
 	export let playlistId: string | null;
 	export let dialogOpen: boolean;
@@ -63,7 +63,7 @@
 		queryResult = [];
 		if (!validateQuery()) return;
 		querying = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await searchDatabaseSong(token, query);
 		if (response.status === 200) {
 			queryResult = response.data.songs_info;
@@ -81,7 +81,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await addSongToPlaylist(token, {
 			playlist_id: playlistId!,
 			song_id: selectedSongId

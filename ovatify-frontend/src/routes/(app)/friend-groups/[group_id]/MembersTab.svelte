@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { defaultImageUrl } from "$lib/constants";
 	import { fade } from "svelte/transition";
-	import { getUserFriends, removeFriend } from "$lib/services/friendService";
-	import { user } from "$lib/stores/user";
 	import type { GroupMember } from "$lib/types";
 	import { Button } from "$lib/components/ui/button";
 	import { displayToast } from "$lib/utils/toast";
@@ -30,7 +28,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await removeFriendFromGroup(token, {
 			group_id: Number($page.params.group_id),
 			friend_name: username

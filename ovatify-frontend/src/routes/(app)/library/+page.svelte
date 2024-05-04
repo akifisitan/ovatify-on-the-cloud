@@ -2,7 +2,7 @@
 	import Carousel from "$lib/components/SongCarousel.svelte";
 	import SongFileComboUpload from "./SongFileUploadModal.svelte";
 	import { displayToast } from "$lib/utils/toast";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import { getRecentlyAddedSongs, getUserFavorites } from "$lib/services/userService";
 	import type { CarouselSong } from "$lib/types";
 	import { refresh } from "$lib/stores/refresh";
@@ -15,7 +15,7 @@
 
 	// Gets data to fill the carousel with recent song additions by the user
 	async function getRecentAdditions() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getRecentlyAddedSongs(token, 10);
 		if (response.status !== 200) {
 			displayToast({ message: "Error getting recent additions", type: "error" });
@@ -26,7 +26,7 @@
 
 	// Gets data to display all recent song additions by the user
 	async function getAllRecentAdditions() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getRecentlyAddedSongs(token, null);
 		if (response.status !== 200) {
 			displayToast({ message: "Error getting recent additions", type: "error" });
@@ -37,7 +37,7 @@
 
 	// Gets data to fill the carousel with the user's favorite songs
 	async function getYourFavorites() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getUserFavorites(token, 10);
 		if (response.status !== 200) {
 			displayToast({ message: "Error getting favorites", type: "error" });
@@ -48,7 +48,7 @@
 
 	// Gets data to display all of the user's favorite songs
 	async function getAllYourFavorites() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getUserFavorites(token, null);
 		if (response.status !== 200) {
 			displayToast({ message: "Error getting favorites", type: "error" });

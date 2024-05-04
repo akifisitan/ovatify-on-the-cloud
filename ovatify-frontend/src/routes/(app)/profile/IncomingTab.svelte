@@ -4,14 +4,14 @@
 	import { sleep } from "$lib/utils/time";
 	import { Button } from "$lib/components/ui/button";
 	import { Check, X } from "lucide-svelte";
-	import { displayToast, makeToast } from "$lib/utils/toast";
+	import { displayToast } from "$lib/utils/toast";
 	import { fade } from "svelte/transition";
 	import {
 		acceptFriendRequest,
 		getUserIncomingFriendRequests,
 		rejectFriendRequest
 	} from "$lib/services/friendService";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import type { Friend } from "$lib/types";
 	import { cn } from "$lib/utils";
 	import { disabledBtn } from "$lib/utils/colors";
@@ -22,8 +22,8 @@
 	let loading = false;
 
 	async function getIncomingRequests() {
-		const token = await $user?.getIdToken();
-		const response = await getUserIncomingFriendRequests(token!);
+		const token = $userData.token!;
+		const response = await getUserIncomingFriendRequests(token);
 		if (response.status !== 200) {
 			return [];
 		}
@@ -37,7 +37,7 @@
 	async function handleFriendRequest(action: "accept" | "reject", username: string) {
 		if (loading) return;
 		loading = true;
-		const token = await $user?.getIdToken();
+		const token = $userData.token!;
 		const response =
 			action === "accept"
 				? await acceptFriendRequest(token!, username)

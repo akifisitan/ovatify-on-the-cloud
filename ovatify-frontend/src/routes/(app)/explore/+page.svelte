@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { user } from "$lib/stores/user";
 	import SongCarousel from "$lib/components/SongCarousel.svelte";
 	import DisplaySongModal from "$lib/components/DisplaySongModal.svelte";
 	import { refresh } from "$lib/stores/refresh";
@@ -13,13 +12,14 @@
 	import type { CarouselSong } from "$lib/types";
 	import Spinner from "$lib/components/Spinner.svelte";
 	import { onDestroy } from "svelte";
+	import { userData } from "$lib/stores/userData";
 
 	let dialogOpen = false;
 	let selectedSongId: string = "";
 	let noFriends = false;
 
 	async function getYouMightLike() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await recommendYouMightLike(token, 10);
 		console.log(response);
 		if (response.status !== 200) {
@@ -30,7 +30,7 @@
 
 	async function getFriendsListen() {
 		noFriends = false;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await recommendFriendsListen(token, 10);
 		console.log(response);
 		if (response.status === 200) {
@@ -56,7 +56,7 @@
 	}
 
 	async function getFriendMix() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await recommendFriendMix(token, 10);
 		console.log(response);
 		if (response.status === 200) {
@@ -73,7 +73,7 @@
 	}
 
 	async function getSinceYouLike() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await recommendSinceYouLike(token, 10);
 		console.log(response);
 		if (response.status !== 200) {

@@ -77,6 +77,7 @@ export type FriendGroup = {
 
 export type UserData = {
 	id: string | null;
+	token: string | null;
 	name: string;
 	img_url: string;
 	preferences: {

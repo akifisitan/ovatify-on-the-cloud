@@ -4,7 +4,6 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Trash2, Search } from "lucide-svelte";
 	import { displayToast } from "$lib/utils/toast";
-	import { user } from "$lib/stores/user";
 	import Stars from "$lib/components/Stars.svelte";
 	import { fade } from "svelte/transition";
 	import { searchSpotifySong, addSong } from "$lib/services/songService";
@@ -13,6 +12,7 @@
 	import { deleteFromCache, songCache } from "$lib/utils/caches";
 	import { refresh } from "$lib/stores/refresh";
 	import { cn } from "$lib/utils";
+	import { userData } from "$lib/stores/userData";
 
 	export let dialogOpen: boolean;
 
@@ -51,7 +51,7 @@
 		queryResult = [];
 		if (!validateQuery()) return;
 		querying = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await searchSpotifySong(token, query);
 		console.log(response);
 
@@ -71,7 +71,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await addSong(token, selectedSongId, selectedSongRating);
 		if (response.status >= 200 && response.status < 300) {
 			displayToast({ type: "success", message: "Rating added successfully" });

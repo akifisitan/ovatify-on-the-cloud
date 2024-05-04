@@ -5,7 +5,7 @@
 	import { Button } from "$lib/components/ui/button";
 	import DisplayPlaylistModal from "$lib/components/DisplayPlaylistModal.svelte";
 	import { createEmptyPlaylist, getUserPlaylists } from "$lib/services/playlistService";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import { displayToast } from "$lib/utils/toast";
 	import { cn } from "$lib/utils";
 	import type { CarouselPlaylist } from "$lib/types";
@@ -16,7 +16,7 @@
 	let loading = false;
 
 	async function getPlaylists() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getUserPlaylists(token);
 		console.log(response);
 		if (response.status === 200) {
@@ -35,7 +35,7 @@
 
 	async function createNewPlaylist() {
 		if (loading) return;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		loading = true;
 		const response = await createEmptyPlaylist(token);
 		if (response.status === 201) {

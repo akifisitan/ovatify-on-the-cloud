@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Button, buttonVariants } from "$lib/components/ui/button";
 	import { displayToast } from "$lib/utils/toast";
-	import { user } from "$lib/stores/user";
 	import { cn } from "$lib/utils";
 	import { uploadSongFile } from "$lib/services/userService";
+	import { userData } from "$lib/stores/userData";
 
 	export let dialogOpen: boolean;
 
@@ -33,7 +33,7 @@
 		if (loading) return;
 		if (!validateFile()) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await uploadSongFile(token, file!);
 		console.log(response);
 		if (response.status === 201) {

@@ -6,7 +6,7 @@
 	import { Textarea } from "$lib/components/ui/textarea";
 	import type { FriendGroup } from "$lib/types";
 	import { displayToast } from "$lib/utils/toast";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import { editFriendGroup } from "$lib/services/groupService";
 	import { createEventDispatcher } from "svelte";
 
@@ -43,7 +43,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await editFriendGroup(token, {
 			group_id: Number(friendGroup.id),
 			name: newGroupName,

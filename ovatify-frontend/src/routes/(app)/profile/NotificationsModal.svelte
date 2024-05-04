@@ -6,7 +6,7 @@
 		deleteFriendSuggestion,
 		getFriendSuggestions
 	} from "$lib/services/friendService";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import type { Friend } from "$lib/types";
 	import * as Dialog from "$lib/components/ui/dialog";
 	import { cn } from "$lib/utils";
@@ -37,7 +37,7 @@
 	};
 
 	async function getAllNotifications() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getFriendSuggestions(token);
 		if (response.status !== 200) {
 			console.log("Error getting friend suggestions");
@@ -53,7 +53,7 @@
 	async function handleDeleteSuggestion(messageId: string) {
 		if (loading) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await deleteFriendSuggestion(token, messageId);
 		if (response.status === 200) {
 			displayToast({ message: "Friend suggestion deleted", type: "success" });
