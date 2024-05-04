@@ -1169,8 +1169,6 @@ def recommend_you_might_like(request, userid):
             # if user_songs.exists() is False:
             #     return JsonResponse({'error': 'No songs found for the user, cannot make recommendation'}, status=404)
 
-            # client_credentials = SpotifyClientCredentials(client_id=os.getenv('SPOTIPY_CLIENT_ID'), client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'))
-            # sp = spotipy.Spotify(client_credentials_manager=client_credentials)
 
             track_list = []
 
@@ -1413,9 +1411,6 @@ def recommend_friend_mix(request, userid):
                     'seed_tracks': songs_seed
                 }
 
-                # client_credentials = SpotifyClientCredentials(client_id=os.getenv('SPOTIPY_CLIENT_ID'), client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'))
-                # sp = spotipy.Spotify(client_credentials_manager=client_credentials)
-                # spotify_recommendations = sp.recommendations(**params)
                 recommendations = get_recommendations(**params)
 
                 if recommendations['items'] is None:
