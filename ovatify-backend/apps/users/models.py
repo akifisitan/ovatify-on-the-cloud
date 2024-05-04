@@ -8,9 +8,12 @@ from songs.models import Song
 from django.contrib.auth.hashers import make_password
 
 
+default_pw = "pbkdf2_sha256$600000$K1JvZegDaEV2QV9Ix0KFWm$y98HSCB3SP7g0DPY3GabXW4Sf/ecPFuS5EXeQdUUE34="
+
+
 class User(CoreModel):
     id = models.CharField(primary_key=True)
-    password = models.CharField(max_length=150, default="password")
+    password = models.CharField(max_length=150, default=default_pw)
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     img_url = models.URLField(max_length=300, blank=True, null=True)
@@ -30,6 +33,7 @@ class User(CoreModel):
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
         self.save()
+
 
 class UserSongRating(CoreModel):
     id = models.AutoField(primary_key=True)
