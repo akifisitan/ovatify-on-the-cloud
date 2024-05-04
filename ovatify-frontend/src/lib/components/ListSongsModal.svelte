@@ -2,14 +2,13 @@
 	import * as Dialog from "$lib/components/ui/dialog";
 	import Spinner from "$lib/components/Spinner.svelte";
 	import type { CarouselSong } from "$lib/types";
-	import { createEventDispatcher } from "svelte";
 	import { fade } from "svelte/transition";
 	import DisplaySongModal from "./DisplaySongModal.svelte";
 
 	export let dialogOpen: boolean;
 	export let functionToCall: () => Promise<CarouselSong[]>;
 
-	let selectedSongId: string | null = null;
+	let selectedSongId: string;
 	let songDetailDialogOpen = false;
 </script>
 

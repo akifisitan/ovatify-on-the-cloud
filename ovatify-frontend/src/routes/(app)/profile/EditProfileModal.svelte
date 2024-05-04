@@ -2,19 +2,14 @@
 	import * as Dialog from "$lib/components/ui/dialog";
 	import * as Avatar from "$lib/components/ui/avatar";
 	import { Input } from "$lib/components/ui/input";
-	import { user } from "$lib/stores/user";
 	import { displayToast } from "$lib/utils/toast";
 	import { deleteUserFromDatabase, editUserProfile } from "$lib/services/userService";
 	import ChooseImageModal from "./ChooseImageModal.svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { Switch } from "$lib/components/ui/switch";
 	import { resetUserData, userData } from "$lib/stores/userData";
-	import { firebaseDeleteUser } from "$lib/utils/firebase";
 	import { cn } from "$lib/utils";
-	import { clearSpotifyState } from "$lib/utils/spotify";
-	import { sleep } from "$lib/utils/time";
-	import { goto } from "$app/navigation";
-	import { authFlowOngoing } from "$lib/stores/authState";
+	import { signOut } from "$lib/services/authService";
 
 	export let dialogOpen: boolean;
 	let imageUrl = $userData.img_url;
@@ -68,7 +63,7 @@
 			data_sharing_consent: dataShareConsent,
 			data_processing_consent: dataProcessingConsent
 		};
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await editUserProfile(token, body);
 		console.log(response);
 		if (response.status === 204) {
@@ -98,17 +93,15 @@
 			return;
 		}
 		deleting = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await deleteUserFromDatabase(token);
 		if (response.status === 204) {
-			firebaseDeleteUser();
+			signOut();
 			resetUserData();
-			clearSpotifyState();
 			displayToast({
 				type: "success",
 				message: "Account deleted successfully"
 			});
-			$authFlowOngoing = true;
 		} else {
 			displayToast({ type: "error", message: "Error deleting profile" });
 		}

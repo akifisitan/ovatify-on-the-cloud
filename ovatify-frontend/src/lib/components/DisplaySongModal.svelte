@@ -4,7 +4,6 @@
 	import { User, MoreHorizontal, LibraryBig, Trash2, Pencil, Users } from "lucide-svelte";
 	import { displayToast } from "$lib/utils/toast";
 	import Stars from "$lib/components/Stars.svelte";
-	import { user } from "$lib/stores/user";
 	import { addSong, getSongById } from "$lib/services/songService";
 	import { defaultImageUrl } from "$lib/constants";
 	import Spinner from "$lib/components/Spinner.svelte";
@@ -21,6 +20,7 @@
 	import { createEventDispatcher } from "svelte";
 	import { goto } from "$app/navigation";
 	import { sleep } from "$lib/utils/time";
+	import { userData } from "$lib/stores/userData";
 
 	export let dialogOpen: boolean;
 	export let selectedSongId: string = "";
@@ -47,10 +47,10 @@
 
 	$: getSong(selectedSongId);
 
-	async function getSong(selectedSongId: string) {
-		if (selectedSongId === "") return;
+	async function getSong(selectedSongId: string | null) {
+		if (!selectedSongId) return;
 		loadingSong = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		song = await getSongById(token, selectedSongId);
 		console.log(song);
 		loadingSong = false;
@@ -63,7 +63,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await editUserSongRating(token, selectedSongId, rating);
 		if (response.status === 201) {
 			displayToast({ message: "Rating updated", type: "success" });
@@ -79,7 +79,7 @@
 	async function deleteRating() {
 		if (loading) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await deleteUserSongRating(token, selectedSongId);
 		console.log(response);
 		if (response.status === 204) {
@@ -109,7 +109,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await addSong(token, selectedSongId, rating);
 		console.log(response);
 		if (response.status >= 200 && response.status < 300) {

@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { user } from "$lib/stores/user";
 	import * as Dialog from "$lib/components/ui/dialog";
 	import Spinner from "$lib/components/Spinner.svelte";
 	import { defaultImageUrl } from "$lib/constants";
-	import type { Playlist, Song } from "$lib/types";
+	import type { Playlist } from "$lib/types";
 	import { displayToast } from "$lib/utils/toast";
 	import { cn } from "$lib/utils";
 	import { fade } from "svelte/transition";
@@ -23,9 +22,8 @@
 	import DisplaySongModal from "$lib/components/DisplaySongModal.svelte";
 	import { Pencil, Plus, Trash2, MinusCircle } from "lucide-svelte";
 	import { Icons } from "$lib/icons";
-	import { spotify } from "$lib/utils/spotify";
 	import { disabledBtn } from "$lib/utils/colors";
-	import { sleep } from "$lib/utils/time";
+	import { userData } from "$lib/stores/userData";
 
 	export let dialogOpen: boolean;
 	export let selectedPlaylistId: string | null;
@@ -39,7 +37,6 @@
 	let editPlaylistDialogOpen = false;
 	let deleteConfirmDialogOpen = false;
 	let songDetailsDialogOpen = false;
-	let importPlaylistSpotifyDialogOpen = false;
 
 	let refresh = false;
 
@@ -56,7 +53,7 @@
 		if (!selectedPlaylistId) return;
 		console.log(`Getting playlist ${selectedPlaylistId}`);
 		loadingPlaylist = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		playlist = await getPlaylistById(token, selectedPlaylistId);
 		console.log(`Selected playlist:`, playlist);
 		loadingPlaylist = false;
@@ -88,7 +85,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await editPlaylist(token, {
 			playlist_id: selectedPlaylistId!,
 			name: newPlaylistName,
@@ -109,7 +106,7 @@
 	async function handleDeleteSongFromPlaylist(songId: string) {
 		if (loading) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await removeSongFromPlaylist(token, selectedPlaylistId!, songId);
 		if (response.status === 200) {
 			displayToast({
@@ -128,7 +125,7 @@
 	async function handleDeletePlaylist() {
 		if (loading) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await deletePlaylist(token, selectedPlaylistId!);
 		if (response.status === 200) {
 			displayToast({ message: "Playlist deleted successfully", type: "success" });
@@ -139,54 +136,6 @@
 		} else {
 			displayToast({ message: "Error deleting playlist", type: "error" });
 		}
-		loading = false;
-	}
-
-	async function handleOpenImportSpotifyDialog() {
-		if (playlist!.songs.length < 3) {
-			displayToast({
-				message: "Add at least 3 songs to the playlist to import the playlist to Spotify",
-				type: "error"
-			});
-			return;
-		}
-		if (loading) return;
-		const spotifyToken = await spotify.getAccessToken();
-		if (!spotifyToken) {
-			await spotify.authenticate();
-			return;
-		}
-		importPlaylistSpotifyDialogOpen = true;
-	}
-
-	async function handleImportSpotify() {
-		if (loading) return;
-		const spotifyToken = await spotify.getAccessToken();
-		if (!spotifyToken) {
-			await spotify.authenticate();
-			return;
-		}
-		loading = true;
-		const { id: user_id } = await spotify.currentUser.profile();
-		if (!playlist) {
-			displayToast({ message: "Error importing playlist", type: "error" });
-			return;
-		}
-		const createdPlaylist = await spotify.playlists.createPlaylist(user_id, {
-			name: playlist.name,
-			description: playlist.description
-		});
-		if (playlist.songs.length > 0) {
-			await spotify.playlists.addItemsToPlaylist(
-				createdPlaylist.id,
-				playlist.songs.map((song) => `spotify:track:${song.id}`)
-			);
-		}
-		displayToast({
-			message: "Playlist imported to Spotify successfully",
-			type: "success"
-		});
-		importPlaylistSpotifyDialogOpen = false;
 		loading = false;
 	}
 </script>
@@ -265,14 +214,6 @@
 									deleteConfirmDialogOpen = true;
 								}
 							}}><Trash2 /><span class="sr-only">Delete Playlist</span></Button
-						>
-						<Button
-							variant="outline"
-							class={cn("p-0 h-10 w-10", disabledBtn(loading))}
-							on:click={handleOpenImportSpotifyDialog}
-							><Icons.spotify class="h-6 w-6" /><span class="sr-only"
-								>Import to Spotify</span
-							></Button
 						>
 					</div>
 					<div class="flex flex-col items-center px-2">
@@ -444,28 +385,6 @@
 			<form on:submit|preventDefault={handleDeletePlaylist} class="w-full">
 				<Button variant="destructive" type="submit" class="w-full"
 					>{loading ? "Deleting..." : "Delete"}</Button
-				>
-			</form>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
-
-<!-- Import playlist to Spotify modal -->
-<Dialog.Root bind:open={importPlaylistSpotifyDialogOpen}>
-	<Dialog.Content class="rounded-lg max-w-[16rem] sm:max-w-xs md:max-w-md">
-		<Dialog.Header>
-			<Dialog.Title>Import this playlist to spotify?</Dialog.Title>
-			<Dialog.Description
-				>This action will import this playlist to your Spotify account.</Dialog.Description
-			>
-		</Dialog.Header>
-		<Dialog.Footer>
-			<form on:submit|preventDefault={handleImportSpotify} class="w-full">
-				<Button
-					variant="outline"
-					type="submit"
-					class="w-full bg-emerald-800 hover:bg-emerald-700"
-					>{loading ? "Importing..." : "Import"}</Button
 				>
 			</form>
 		</Dialog.Footer>

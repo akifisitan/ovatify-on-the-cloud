@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createFriendGroup, getFriendGroups } from "$lib/services/groupService";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import type { FriendGroup } from "$lib/types";
 	import { Button } from "$lib/components/ui/button";
 	import { displayToast } from "$lib/utils/toast";
@@ -13,7 +13,7 @@
 	let loading = false;
 
 	async function getAllFriendGroups() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getFriendGroups(token);
 		if (response.status !== 200) {
 			return [];
@@ -28,7 +28,7 @@
 	async function createNewFriendGroup() {
 		if (loading) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await createFriendGroup(token, "New Friend Group");
 		console.log(response);
 		if (response.status === 201) {

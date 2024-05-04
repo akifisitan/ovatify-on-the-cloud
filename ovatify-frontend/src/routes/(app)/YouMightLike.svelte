@@ -3,14 +3,14 @@
 	import type { CarouselSong } from "$lib/types";
 	import { Skeleton } from "$lib/components/ui/skeleton";
 	import { fade } from "svelte/transition";
-	import { user } from "$lib/stores/user";
 	import { recommendYouMightLike } from "$lib/services/recommendationService";
 	import { displayToast } from "$lib/utils/toast";
+	import { userData } from "$lib/stores/userData";
 
 	const dispatch = createEventDispatcher<{ toggleEvent: string }>();
 
 	async function getYouMightLike() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await recommendYouMightLike(token, 8);
 		if (response.status !== 200) {
 			displayToast({ message: "Error getting songs you might like", type: "error" });

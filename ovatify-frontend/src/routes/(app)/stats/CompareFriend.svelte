@@ -2,20 +2,19 @@
 	import * as Dialog from "$lib/components/ui/dialog";
 	import { buttonVariants } from "$lib/components/ui/button";
 	import Spinner from "$lib/components/Spinner.svelte";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import { getConsentFriends } from "$lib/services/friendService";
 	import { Button } from "$lib/components/ui/button";
 	import type { Friend } from "$lib/types";
 	import { fade } from "svelte/transition";
 	import { defaultImageUrl } from "$lib/constants";
-	import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
 	import { createEventDispatcher } from "svelte";
 
 	let dialogOpen = false;
 
 	async function getConsentFriendList() {
-		const token = await $user?.getIdToken();
-		const response = await getConsentFriends(token!);
+		const token = $userData.token!;
+		const response = await getConsentFriends(token);
 		console.log(response);
 		if (response.status !== 200) {
 			return [];

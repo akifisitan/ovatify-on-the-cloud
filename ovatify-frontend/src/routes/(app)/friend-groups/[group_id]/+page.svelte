@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/stores";
 	import { getFriendGroupById } from "$lib/services/groupService";
-	import { user } from "$lib/stores/user";
 	import type { FriendGroup } from "$lib/types";
 	import { fade } from "svelte/transition";
 	import { Button } from "$lib/components/ui/button";
@@ -23,7 +22,7 @@
 	let deleteGroupDialogOpen = false;
 
 	async function getFriendGroup() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const groupId = Number($page.params.group_id);
 		if (isNaN(groupId)) {
 			throw new Error("Invalid group id");

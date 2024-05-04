@@ -6,7 +6,7 @@
 	import { X } from "lucide-svelte";
 	import { displayToast, makeToast } from "$lib/utils/toast";
 	import { fade } from "svelte/transition";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import {
 		cancelFriendRequest,
 		getUserOutgoingFriendRequests
@@ -17,7 +17,7 @@
 	let loading = false;
 
 	async function getOutgoingRequests() {
-		const token = await $user?.getIdToken();
+		const token = $userData.token!;
 		const response = await getUserOutgoingFriendRequests(token!);
 		console.log(response);
 		if (response.status !== 200) {
@@ -33,7 +33,7 @@
 	async function handleCancelFriendRequest(username: string) {
 		if (loading) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await cancelFriendRequest(token, username);
 		console.log(response);
 		if (response.status === 200) {

@@ -7,10 +7,8 @@
 		getRecentAdditionCounts,
 		getFriendRecentAdditionCounts
 	} from "$lib/services/userService";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import * as Tabs from "$lib/components/ui/tabs";
-	import ShareOnX from "$lib/components/charts/ShareOnX.svelte";
-	import { page } from "$app/stores";
 	import Spinner from "$lib/components/Spinner.svelte";
 	import CompareFriend from "./CompareFriend.svelte";
 
@@ -24,7 +22,7 @@
 	const colors = ["#cdc9c9", "#6c7b8b", "#36454f", "#37363c", "#dfd8d2"] as const;
 
 	async function getEntityChart(entity: ChartEntity) {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getEntityCount(token, entity);
 		if (response.status === 200) {
 			const data = response.data;
@@ -37,7 +35,7 @@
 	}
 
 	async function getFriendEntityChart(friend_id: string, entity: ChartEntity) {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getFriendEntityCount(token, friend_id, entity);
 		if (response.status === 200) {
 			const data = response.data;
@@ -72,7 +70,7 @@
 	}
 
 	async function getRecentChart() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getRecentAdditionCounts(token);
 		if (response.status === 200) {
 			const songCounts: { date: string; count: number }[] = response.data.song_counts;
@@ -86,7 +84,7 @@
 	async function getFriendRecentChart(friend_id: string) {
 		console.log("Fetching data for friend with ID:", friend_id);
 
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getFriendRecentAdditionCounts(token, friend_id);
 		if (response.status === 200) {
 			console.log("Still ID:", friend_id);
@@ -214,13 +212,6 @@
 										entityName={entity.slice(0, -1)}
 									/>
 								</div>
-								<div class="flex justify-center items-center gap-2">
-									<p>Share on X</p>
-									<ShareOnX
-										text={entityBarChartShareText(entity, data)}
-										url={$page.url.origin}
-									/>
-								</div>
 							{/if}
 						{/await}
 					</Tabs.Content>
@@ -259,10 +250,6 @@
 								lineColor={colors[0]}
 								friendLineColor={"#006738"}
 							/>
-							<div class="flex justify-center items-center gap-2">
-								<p>Share on X</p>
-								<ShareOnX text={recentChartShareText(data)} url={$page.url.origin} />
-							</div>
 						{/if}
 					{/await}
 				</div>

@@ -3,7 +3,7 @@
 	import { defaultImageUrl } from "$lib/constants";
 	import { fade } from "svelte/transition";
 	import { getUserFriends, removeFriend } from "$lib/services/friendService";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import type { Friend } from "$lib/types";
 	import { Button } from "$lib/components/ui/button";
 	import { displayToast } from "$lib/utils/toast";
@@ -17,8 +17,8 @@
 	let loading = false;
 
 	async function getAllFriends() {
-		const token = await $user?.getIdToken();
-		const response = await getUserFriends(token!);
+		const token = $userData.token!;
+		const response = await getUserFriends(token);
 		if (response.status !== 200) {
 			return [];
 		}
@@ -32,7 +32,7 @@
 	async function handleRemoveFriend(username: string) {
 		if (loading) return;
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await removeFriend(token, username);
 		if (response.status === 200) {
 			displayToast({

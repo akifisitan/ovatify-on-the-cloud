@@ -3,19 +3,17 @@
 	import * as Avatar from "$lib/components/ui/avatar";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 	import { displayToast } from "$lib/utils/toast";
-	import { firebaseSignOut } from "$lib/utils/firebase";
 	import { resetUserData, userData } from "$lib/stores/userData";
 	import { dev } from "$app/environment";
-	import { clearSpotifyState } from "$lib/utils/spotify";
+	import { signOut } from "$lib/services/authService";
 
 	let loading = false;
 
-	async function signout() {
+	async function handleSignout() {
 		if (loading) return;
 		loading = true;
 		try {
-			await firebaseSignOut();
-			clearSpotifyState();
+			signOut();
 			resetUserData();
 			displayToast({ type: "success", message: "Signed out successfully" });
 		} catch (error) {
@@ -50,7 +48,7 @@
 		<DropdownMenu.Separator />
 		<DropdownMenu.Group>
 			<DropdownMenu.Item
-				on:click={signout}
+				on:click={handleSignout}
 				class="cursor-pointer py-2"
 				data-testid="logout-btn"
 			>

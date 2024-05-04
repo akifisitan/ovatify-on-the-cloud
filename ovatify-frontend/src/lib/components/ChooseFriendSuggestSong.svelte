@@ -2,7 +2,6 @@
 	import Spinner from "$lib/components/Spinner.svelte";
 	import { fade } from "svelte/transition";
 	import { getUserFriends, suggestSong } from "$lib/services/friendService";
-	import { user } from "$lib/stores/user";
 	import type { Friend } from "$lib/types";
 	import * as Dialog from "$lib/components/ui/dialog";
 	import { cn } from "$lib/utils";
@@ -10,6 +9,7 @@
 	import { Button } from "$lib/components/ui/button";
 	import { displayToast } from "$lib/utils/toast";
 	import { sleep } from "$lib/utils/time";
+	import { userData } from "$lib/stores/userData";
 
 	export let dialogOpen: boolean;
 	export let songId: string;
@@ -22,7 +22,7 @@
 	}
 
 	async function getAllFriends() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		// await sleep(100);
 		const response = await getUserFriends(token);
 		if (response.status !== 200) {
@@ -42,7 +42,7 @@
 			return;
 		}
 		loading = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await suggestSong(token, {
 			receiver_user: chosenFriendUsername,
 			song_id: songId

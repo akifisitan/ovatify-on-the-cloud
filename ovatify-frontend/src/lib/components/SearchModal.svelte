@@ -4,12 +4,12 @@
 	import { Input } from "$lib/components/ui/input";
 	import { Search } from "lucide-svelte";
 	import { displayToast } from "$lib/utils/toast";
-	import { user } from "$lib/stores/user";
 	import { fade } from "svelte/transition";
 	import { searchDatabaseSong } from "$lib/services/songService";
 	import { defaultImageUrl } from "$lib/constants";
 	import type { SongQueryResponse } from "$lib/types";
 	import DisplaySongModal from "$lib/components/DisplaySongModal.svelte";
+	import { userData } from "$lib/stores/userData";
 
 	export let dialogOpen: boolean;
 	let songDetailsDialogOpen = false;
@@ -56,7 +56,7 @@
 		queryResult = [];
 		if (!validateQuery()) return;
 		querying = true;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await searchDatabaseSong(token, query);
 		console.log(response);
 		if (response.status === 200) {

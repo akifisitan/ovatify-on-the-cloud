@@ -4,7 +4,7 @@
 	import { fade } from "svelte/transition";
 	import { Button } from "$lib/components/ui/button";
 	import DisplayPlaylistModal from "$lib/components/DisplayPlaylistModal.svelte";
-	import { user } from "$lib/stores/user";
+	import { userData } from "$lib/stores/userData";
 	import { displayToast } from "$lib/utils/toast";
 	import { cn } from "$lib/utils";
 	import type { CarouselGroupPlaylist } from "$lib/types";
@@ -21,7 +21,7 @@
 	let loading = false;
 
 	async function getGroupPlaylists() {
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		const response = await getPlaylistsOfGroup(token, $page.params.group_id);
 		if (response.status !== 200) {
 			return [];
@@ -38,7 +38,7 @@
 
 	async function createNewPlaylist() {
 		if (loading) return;
-		const token = await $user!.getIdToken();
+		const token = $userData.token!;
 		loading = true;
 		const response = await createNewGroupPlaylist(token, Number($page.params.group_id));
 		if (response.status === 201) {
