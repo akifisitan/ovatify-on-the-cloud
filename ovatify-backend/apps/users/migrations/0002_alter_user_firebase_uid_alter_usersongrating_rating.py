@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='firebase_uid',
+            model_name="user",
+            name="firebase_uid",
             field=models.CharField(max_length=200, primary_key=True, serialize=False),
         ),
         migrations.AlterField(
-            model_name='usersongrating',
-            name='rating',
+            model_name="usersongrating",
+            name="rating",
             field=models.DecimalField(decimal_places=2, max_digits=4),
         ),
     ]

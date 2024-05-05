@@ -9,7 +9,8 @@ def health_check(request):
     context = {"status": "OK"}
     return JsonResponse(context, status=200)
 
+
 def custom_openapi(request):
-    with open('openapi.json', 'r') as file:
+    with open("openapi.json", "r") as file:
         data = json.load(file)
         return JsonResponse(data)

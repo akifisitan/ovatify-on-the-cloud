@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('songs', '0011_alter_album_release_year_alter_song_release_year'),
+        ("songs", "0011_alter_album_release_year_alter_song_release_year"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='album',
-            name='id',
+            model_name="album",
+            name="id",
             field=models.CharField(max_length=300, primary_key=True, serialize=False),
         ),
         migrations.AlterField(
-            model_name='artist',
-            name='id',
+            model_name="artist",
+            name="id",
             field=models.CharField(max_length=300, primary_key=True, serialize=False),
         ),
     ]

@@ -7,13 +7,15 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('songs', '0003_rename_songartist_artistsong_remove_song_genre_and_more'),
+        ("songs", "0003_rename_songartist_artistsong_remove_song_genre_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='song',
-            name='id',
-            field=models.CharField(default=uuid.uuid4, max_length=200, primary_key=True, serialize=False),
+            model_name="song",
+            name="id",
+            field=models.CharField(
+                default=uuid.uuid4, max_length=200, primary_key=True, serialize=False
+            ),
         ),
     ]

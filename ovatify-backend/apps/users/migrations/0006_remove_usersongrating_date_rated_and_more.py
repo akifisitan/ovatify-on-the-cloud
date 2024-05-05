@@ -7,8 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0005_remove_usersongrating_date_rated_user_friends_and_more'),
+        ("users", "0005_remove_usersongrating_date_rated_user_friends_and_more"),
     ]
 
-    operations = [
-    ]
+    operations = []

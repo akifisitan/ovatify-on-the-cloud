@@ -53,11 +53,11 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # Use nose to run all tests
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
 
 # Tell nose to measure coverage on the 'foo' and 'bar' apps
 NOSE_ARGS = [
@@ -114,7 +114,7 @@ DATABASES = {
         "USER": PG_USER,
         "PASSWORD": PG_PASSWORD,
         "HOST": PG_HOST,
-        "PORT": "5432"
+        "PORT": "5432",
     }
 }
 

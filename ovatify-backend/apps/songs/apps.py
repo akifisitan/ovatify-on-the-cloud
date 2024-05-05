@@ -4,5 +4,5 @@ AppConfig.default = False
 
 
 class SongsConfig(AppConfig):
-    name = 'songs'
-    label = 'songs'
+    name = "songs"
+    label = "songs"
