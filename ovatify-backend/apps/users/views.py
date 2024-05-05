@@ -4,18 +4,14 @@ import tempfile
 import uuid
 from collections import Counter
 from datetime import datetime, timedelta
-from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.db.models import Prefetch, DateField, Count, Sum
-from django.db.models.functions import TruncDay
+from django.db.models import Prefetch, Count, Sum
 from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from OVTF_Backend.firebase_auth import token_required
-import spotipy
 from songs.utils import serializePlaylist, serializePlaylistInfo
 from users.utils import (
-    recommendation_creator,
     serializeFriendGroupSimple,
     serializeFriendGroupExtended,
 )
@@ -25,15 +21,9 @@ from songs.models import (
     Genre,
     Mood,
     Tempo,
-    GenreSong,
     ArtistSong,
     Artist,
-    AlbumSong,
-    Album,
-    InstrumentSong,
     RecordedEnvironment,
-    Instrument,
-    PlaylistSong,
 )
 from users.models import (
     SuggestionNotification,
@@ -48,18 +38,13 @@ from users.models import (
 from users.utils import (
     get_recommendations,
     getFavoriteGenres,
-    getFavoriteSongs,
     getFavoriteArtists,
-    getFavoriteMoods,
-    getFavoriteTempos,
 )
-from spotipy.oauth2 import SpotifyClientCredentials
-import os
 import random
 from django.contrib.auth.hashers import check_password
 
 
-# Create endpoints
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -67,28 +52,12 @@ from django.contrib.auth.hashers import check_password
 def get_all_users(request, userid):
     if request.method != "GET":
         return HttpResponse(status=405)
-    # retrieve all users from database
     try:
         users = User.objects.all().values()
     except Exception as e:
+        logger.error(f"Database error: {str(e)}")
         return JsonResponse({"error": "Database error"}, status=500)
-
     context = {"users": list(users)}
-    return JsonResponse(context, status=200)
-
-
-@csrf_exempt
-@token_required
-def return_post_body(request, userid):
-    # Return userid with 200 status code
-    return JsonResponse({"userid": userid}, status=200)
-
-    data = json.loads(request.body.decode("utf-8"))
-    username = None
-    if data.get("username") is not None:
-        username = data["username"]
-
-    context = {"received": True, "username": username, "data": data}
     return JsonResponse(context, status=200)
 
 
@@ -151,6 +120,7 @@ def delete_user(request, userid):
         user.hard_delete()
         return HttpResponse(status=204)
     except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
         return HttpResponse(status=404)
 
 
@@ -165,6 +135,7 @@ def update_user(request, userid):
         # TODO update the fields according to what the user wants to update
         return HttpResponse(status=204)
     except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
         return HttpResponse(status=404)
 
 
@@ -195,6 +166,7 @@ def user_songs_view(request, user_id):
         ]
         return JsonResponse({"songs": serialized_songs})
     except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
         return JsonResponse({"error": str(e)}, status=500)
 
 
@@ -228,16 +200,10 @@ def user_preferences_create(request, userid):
 
 @csrf_exempt
 @token_required
-def hello_github(request):
-    return JsonResponse({"message": "Congrats from Ovatify Team!"}, status=200)
-
-
-@csrf_exempt
-@token_required
 def add_song_rating(request, userid):
     try:
         if request.method == "POST":
-            data = json.loads(request.body, encoding="utf-8")
+            data = json.loads(request.body.decode("utf-8"))
             song_id = data.get("song_id")
             rating = float(data.get("rating"))
 
@@ -319,7 +285,7 @@ def add_friend(request, userid):
         if request.method != "POST":
             return HttpResponse(status=405)
 
-        data = json.loads(request.body, encoding="utf-8")
+        data = json.loads(request.body.decode("utf-8"))
         friend_id = data.get("friend_id")
 
         user = User.objects.get(id=userid)
@@ -341,44 +307,40 @@ def add_friend(request, userid):
 @csrf_exempt
 @token_required
 def edit_song_rating(request, userid):
+    if request.method != "PUT":
+        return JsonResponse({"error": "Invalid method"}, status=405)
     try:
-        if request.method == "PUT":
-            data = json.loads(request.body, encoding="utf-8")
-            song_id = data.get("song_id")
-            rating = float(data.get("rating"))
+        data = json.loads(request.body)
+        song_id = data.get("song_id")
+        rating = float(data.get("rating"))
 
-            if userid is None or song_id is None or rating is None:
-                return JsonResponse({"error": "Missing parameter"}, status=400)
+        if userid is None or song_id is None or rating is None:
+            return JsonResponse({"error": "Missing parameter"}, status=400)
 
-            try:
-                user = User.objects.get(id=userid)
-            except User.DoesNotExist:
-                return JsonResponse({"error": "User not found"}, status=404)
+        try:
+            user = User.objects.get(id=userid)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
 
-            try:
-                song = Song.objects.get(id=song_id)
-            except Song.DoesNotExist:
-                return JsonResponse({"error": "Song not found"}, status=404)
+        try:
+            song = Song.objects.get(id=song_id)
+        except Song.DoesNotExist:
+            return JsonResponse({"error": "Song not found"}, status=404)
 
-            try:
-                user_rating = UserSongRating.objects.get(user=user, song=song)
-            except UserSongRating.DoesNotExist:
-                return JsonResponse({"error": "User rating not found"}, status=404)
+        try:
+            user_rating = UserSongRating.objects.get(user=user, song=song)
+        except UserSongRating.DoesNotExist:
+            return JsonResponse({"error": "User rating not found"}, status=404)
 
-            user_rating.delete()
+        user_rating.delete()
 
-            new_user_rating = UserSongRating(
-                user=user,
-                song=song,
-                rating=rating,
-            )
-            new_user_rating.save()
-
-            return JsonResponse(
-                {"message": "User rating updated successfully"}, status=201
-            )
-        else:
-            return JsonResponse({"error": "Invalid method"}, status=400)
+        new_user_rating = UserSongRating(
+            user=user,
+            song=song,
+            rating=rating,
+        )
+        new_user_rating.save()
+        return JsonResponse({"message": "User rating updated successfully"}, status=201)
     except KeyError as e:
         logging.error(f"A KeyError occurred: {str(e)}")
         return JsonResponse({"error": "KeyError occurred"}, status=500)
@@ -1457,98 +1419,57 @@ def get_profile_stats(request, userid):
 @csrf_exempt
 @token_required
 def recommend_since_you_like(request, userid):
+    if request.method != "GET":
+        return JsonResponse({"error": "Invalid method"}, status=400)
     try:
-        if request.method != "GET":
-            return JsonResponse({"error": "Invalid method"}, status=400)
-        else:
-            data = request.GET
-            count = int(data.get("count"))
+        data = request.GET
+        count = int(data.get("count"))
+        if count is None or count < 1 or count > 100:
+            return JsonResponse({"error": "Wrong parameter"}, status=404)
 
-            client_credentials = SpotifyClientCredentials(
-                client_id=os.getenv("SPOTIPY_CLIENT_ID"),
-                client_secret=os.getenv("SPOTIPY_CLIENT_SECRET"),
-            )
-            sp = spotipy.Spotify(client_credentials_manager=client_credentials)
+        user_genre_seeds = getFavoriteGenres(userid, number_of_songs=20)
+        user_genre_seeds = [seed for seed, _ in user_genre_seeds]
 
-            if count is None or count < 1 or count > 100:
-                return JsonResponse({"error": "Wrong parameter"}, status=404)
-
-            # global available_genre_seeds
-            # if available_genre_seeds is None:
-            #     available_genre_seeds = sp.recommendation_genre_seeds()['genres']
-
-            ratings = UserSongRating.objects.filter(user=userid).order_by("-rating")[
-                :20
-            ]
-
-            user_genre_seeds = []
-            user_genre_seeds = getFavoriteGenres(userid, number_of_songs=20)
-            user_genre_seeds = [seed for seed, _ in user_genre_seeds]
-            # for rating in ratings:
-            #     song = Song.objects.get(id=rating.song.id)
-            #     for genre in song.genres.all():
-            #         user_genre_seeds.append(genre.name.lower())
-            # list(set(user_genre_seeds))
-
-            # user_genre_seeds = [seed for seed in user_genre_seeds if seed in available_genre_seeds]
-
-            if len(user_genre_seeds) < 2:
-                return JsonResponse(
-                    {
-                        "error": "No genre found for the user, cannot make recommendation"
-                    },
-                    status=404,
-                )
-            user_genre_seeds = user_genre_seeds[:2]
-
-            artist_list = {}
-            artist_list = getFavoriteArtists(userid, number_of_songs=20)
-            artist_list = [name for name, _ in artist_list]
-            # for rating in ratings:
-            #     song = Song.objects.get(id=rating.song.id)
-            #     for artist in song.artists.all():
-            #         artist_list[artist.name] = artist.id
-
-            # if len(artist_list) > 2:
-            #     selected_artists = random.sample(artist_list.items(), 2)
-            #     artist_list = dict(selected_artists)
-
-            if len(artist_list) < 2:
-                return JsonResponse(
-                    {
-                        "error": "No artist found for the user, cannot make recommendation"
-                    },
-                    status=404,
-                )
-            artist_list = artist_list[:2]
-
-            results = {}
-
-            for genre in user_genre_seeds:
-                params = {"limit": count, "seed_genres": [genre]}
-                # spotify_recommendations = sp.recommendations(**params)
-                recommendations = get_recommendations(**params)
-                if recommendations["items"] is None:
-                    return JsonResponse({"error": recommendations["error"]}, status=404)
-                # results[genre] = recommendation_creator(spotify_recommendations)
-                results[genre.title()] = recommendations["items"]
-
-            for artist_name in artist_list:
-                params = {"limit": count, "seed_artists": [artist_name]}
-                # spotify_recommendations = sp.recommendations(**params)
-                recommendations = get_recommendations(**params)
-                if recommendations["items"] is None:
-                    return JsonResponse({"error": recommendations["error"]}, status=404)
-                # results[artist] = recommendation_creator(spotify_recommendations)
-                results[artist_name.title()] = recommendations["items"]
-
+        if len(user_genre_seeds) < 2:
             return JsonResponse(
-                {
-                    "message": "Recommendation based on what you listen is successful",
-                    "tracks_info": results,
-                },
-                status=200,
+                {"error": "No genre found for the user, cannot make recommendation"},
+                status=404,
             )
+        user_genre_seeds = user_genre_seeds[:2]
+
+        artist_list = getFavoriteArtists(userid, number_of_songs=20)
+        artist_list = [name for name, _ in artist_list]
+
+        if len(artist_list) < 2:
+            return JsonResponse(
+                {"error": "No artist found for the user, cannot make recommendation"},
+                status=404,
+            )
+        artist_list = artist_list[:2]
+
+        results = {}
+
+        for genre in user_genre_seeds:
+            params = {"limit": count, "seed_genres": [genre]}
+            recommendations = get_recommendations(**params)
+            if recommendations["items"] is None:
+                return JsonResponse({"error": recommendations["error"]}, status=404)
+            results[genre.title()] = recommendations["items"]
+
+        for artist_name in artist_list:
+            params = {"limit": count, "seed_artists": [artist_name]}
+            recommendations = get_recommendations(**params)
+            if recommendations["items"] is None:
+                return JsonResponse({"error": recommendations["error"]}, status=404)
+            results[artist_name.title()] = recommendations["items"]
+
+        return JsonResponse(
+            {
+                "message": "Recommendation based on what you listen is successful",
+                "tracks_info": results,
+            },
+            status=200,
+        )
     except KeyError as e:
         logging.error(f"A KeyError occurred: {str(e)}")
         return JsonResponse({"error": "KeyError occurred"}, status=500)
@@ -1560,81 +1481,72 @@ def recommend_since_you_like(request, userid):
 @csrf_exempt
 @token_required
 def recommend_friend_mix(request, userid):
+    if request.method != "GET":
+        return JsonResponse({"error": "Invalid method"}, status=400)
     try:
-        if request.method != "GET":
-            return JsonResponse({"error": "Invalid method"}, status=400)
-        else:
-            data = request.GET
-            count = data.get("count")
-            count = int(count)
+        data = request.GET
+        count = data.get("count")
+        count = int(count)
 
-            if count > 100 or count < 1:
-                return JsonResponse({"error": "Invalid count"}, status=400)
+        if count > 100 or count < 1:
+            return JsonResponse({"error": "Invalid count"}, status=400)
 
-            try:
-                user = User.objects.get(id=userid)
-                friends_list = Friend.objects.filter(user=user)
+        try:
+            user = User.objects.get(id=userid)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
 
-                available_friends = []
-                for friend in friends_list:
-                    if (
-                        UserPreferences.objects.get(
-                            user=friend.friend
-                        ).data_processing_consent
-                        is True
-                    ):
-                        available_friends.append(friend)
+        friends_list = Friend.objects.filter(user=user)
+        available_friends = []
+        for friend in friends_list:
+            if (
+                UserPreferences.objects.get(user=friend.friend).data_processing_consent
+                is True
+            ):
+                available_friends.append(friend)
 
-                if len(available_friends) < 1:
-                    return JsonResponse(
-                        {
-                            "error": "No friends found for the user, cannot make recommendation"
-                        },
-                        status=404,
-                    )
+        if len(available_friends) < 1:
+            return JsonResponse(
+                {"error": "No friends found for the user, cannot make recommendation"},
+                status=404,
+            )
 
-                songs_seed = []
-                for friend in available_friends:
-                    friend_songs = UserSongRating.objects.filter(
-                        user=friend.friend
-                    ).order_by("-rating")
-                    for song in friend_songs:
-                        songs_seed.append(song.song.id)
+        songs_seed = []
+        for friend in available_friends:
+            friend_songs = UserSongRating.objects.filter(user=friend.friend).order_by(
+                "-rating"
+            )
+            for song in friend_songs:
+                songs_seed.append(song.song.id)
 
-                list(set(songs_seed))
+        list(set(songs_seed))
 
-                if len(songs_seed) > 5:
-                    songs_seed = random.sample(songs_seed, 5)
+        if len(songs_seed) > 5:
+            songs_seed = random.sample(songs_seed, 5)
 
-                elif len(songs_seed) < 1:
-                    return JsonResponse(
-                        {
-                            "error": "No songs found for friends, cannot make recommendation"
-                        },
-                        status=404,
-                    )
+        elif len(songs_seed) < 1:
+            return JsonResponse(
+                {"error": "No songs found for friends, cannot make recommendation"},
+                status=404,
+            )
 
-                params = {"limit": count, "seed_tracks": songs_seed}
+        params = {"limit": count, "seed_tracks": songs_seed}
+        recommendations = get_recommendations(**params)
 
-                recommendations = get_recommendations(**params)
-
-                if recommendations["items"] is None:
-                    return JsonResponse(
-                        {
-                            "error": "No recommendations based on friends can be made currently, please try again later"
-                        },
-                        status=404,
-                    )
-                # tracks_info = recommendation_creator(spotify_recommendations)
-                return JsonResponse(
-                    {
-                        "message": "Recommendation based on friends is successful",
-                        "tracks_info": recommendations["items"],
-                    },
-                    status=200,
-                )
-            except User.DoesNotExist:
-                return JsonResponse({"error": "User not found"}, status=404)
+        if recommendations["items"] is None:
+            return JsonResponse(
+                {
+                    "error": "No recommendations based on friends can be made currently, please try again later"
+                },
+                status=404,
+            )
+        return JsonResponse(
+            {
+                "message": "Recommendation based on friends is successful",
+                "tracks_info": recommendations["items"],
+            },
+            status=200,
+        )
     except KeyError as e:
         logging.error(f"A KeyError occurred: {str(e)}")
         return JsonResponse({"error": "KeyError occurred"}, status=500)
@@ -1646,68 +1558,55 @@ def recommend_friend_mix(request, userid):
 @csrf_exempt
 @token_required
 def recommend_friend_listen(request, userid):
+    if request.method != "GET":
+        return JsonResponse({"error": "Invalid method"}, status=400)
     try:
-        if request.method != "GET":
-            return JsonResponse({"error": "Invalid method"}, status=400)
-        else:
-            data = request.GET
-            count = data.get("count")
+        data = request.GET
+        count = int(data.get("count"))
 
-            limit = 1
+        if count < 1:
+            return JsonResponse({"error": "Invalid count"}, status=400)
 
-            count = int(count)
-            if count < 1:
-                return JsonResponse({"error": "Invalid count"}, status=400)
-            friends = Friend.objects.filter(user=userid)
+        friends = Friend.objects.filter(user=userid)
+        friends_list = []
 
-            friends_list = []
+        for user in friends:
+            if (
+                UserPreferences.objects.get(user=user.friend).data_processing_consent
+                is True
+            ):
+                friends_list.append(user)
 
-            for user in friends:
-                if (
-                    UserPreferences.objects.get(
-                        user=user.friend
-                    ).data_processing_consent
-                    is True
-                ):
-                    friends_list.append(user)
+        if len(friends_list) < 1:
+            return JsonResponse(
+                {"error": "No friends found for the user, cannot make recommendation"},
+                status=404,
+            )
 
-            if len(friends_list) < 1:
-                return JsonResponse(
-                    {
-                        "error": "No friends found for the user, cannot make recommendation"
-                    },
-                    status=404,
-                )
+        friend_count = len(friends_list)
+        limit = 1
+        if count > friend_count:
+            limit = count // friend_count
+        songs_list = []
 
-            friend_count = len(friends_list)
+        for friend in friends_list:
+            friend_songs = UserSongRating.objects.filter(user=friend.friend).order_by(
+                "-rating"
+            )[:limit]
+            for rating in friend_songs:
+                song = Song.objects.get(id=rating.song.id)
 
-            if count > friend_count:
-                limit = count // friend_count
-            songs_list = []
+                track_info = {
+                    "name": song.name,
+                    "main_artist": [artist.name for artist in song.artists.all()],
+                    "release_year": song.release_year,
+                    "id": song.id,
+                    "img_url": song.img_url,
+                }
+                songs_list.append(track_info)
 
-            for friend in friends_list:
-                friend_songs = UserSongRating.objects.filter(
-                    user=friend.friend
-                ).order_by("-rating")[:10]
-                for rating in friend_songs:
-                    song = Song.objects.get(id=rating.song.id)
-
-                    track_info = {
-                        "name": song.name,
-                        "main_artist": [artist.name for artist in song.artists.all()],
-                        "release_year": song.release_year,
-                        "id": song.id,
-                        "img_url": song.img_url,
-                    }
-                    songs_list.append(track_info)
-            if len(songs_list) > count:
-                songs_list = random.sample(songs_list, count)
-            elif len(songs_list) < 1:
-                return JsonResponse(
-                    {"error": "No songs found for friends, cannot make recommendation"},
-                    status=404,
-                )
-
+        if len(songs_list) > count:
+            songs_list = random.sample(songs_list, count)
             return JsonResponse(
                 {
                     "message": "Recommendation based on friends is successful",
@@ -1715,6 +1614,18 @@ def recommend_friend_listen(request, userid):
                 },
                 status=200,
             )
+        if len(songs_list) > 1:
+            return JsonResponse(
+                {
+                    "message": "Recommendation based on friends is successful",
+                    "tracks_info": songs_list,
+                },
+                status=200,
+            )
+        return JsonResponse(
+            {"error": "No songs found for friends, cannot make recommendation"},
+            status=404,
+        )
     except KeyError as e:
         logging.error(f"A KeyError occurred: {str(e)}")
         return JsonResponse({"error": "KeyError occurred"}, status=500)
@@ -2739,7 +2650,7 @@ def edit_friend_group(request, userid):
     if request.method != "PUT":
         return HttpResponse(status=405)
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode("utf-8"))
         group_id = data.get("group_id")
         name = data.get("name")
         description = data.get("description")
@@ -2912,39 +2823,38 @@ def delete_playlist_from_group(request, userid):
 @csrf_exempt
 @token_required
 def suggest_song(request, userid):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=400)
     try:
-        if request.method != "POST":
-            return JsonResponse({"error": "Invalid method"}, status=400)
-        else:
-            data = json.loads(request.body, encoding="utf-8")
-            receiver_user = data.get("receiver_user")
-            song_id = data.get("song_id")
+        data = json.loads(request.body.decode("utf-8"))
+        receiver_user = data.get("receiver_user")
+        song_id = data.get("song_id")
 
-            if receiver_user is None or song_id is None:
-                return JsonResponse({"error": "Missing parameters"}, status=400)
+        if receiver_user is None or song_id is None:
+            return JsonResponse({"error": "Missing parameters"}, status=400)
 
-            try:
-                sender = User.objects.get(id=userid)
-                receiver = User.objects.get(username=receiver_user)
-                song = Song.objects.get(id=song_id)
-            except User.DoesNotExist:
-                return JsonResponse({"error": "User not found"}, status=404)
-            except Song.DoesNotExist:
-                return JsonResponse({"error": "Song not found"}, status=404)
+        try:
+            sender = User.objects.get(id=userid)
+            receiver = User.objects.get(username=receiver_user)
+            song = Song.objects.get(id=song_id)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
+        except Song.DoesNotExist:
+            return JsonResponse({"error": "Song not found"}, status=404)
 
-            if sender == receiver:
-                return JsonResponse(
-                    {"error": "You cannot send a song to yourself"}, status=400
-                )
-
-            suggestion_notification = SuggestionNotification(
-                suggester=sender, receiver=receiver, song=song
-            )
-            suggestion_notification.save()
-
+        if sender == receiver:
             return JsonResponse(
-                {"message": "Song suggestion sent successfully"}, status=200
+                {"error": "You cannot send a song to yourself"}, status=400
             )
+
+        suggestion_notification = SuggestionNotification(
+            suggester=sender, receiver=receiver, song=song
+        )
+        suggestion_notification.save()
+
+        return JsonResponse(
+            {"message": "Song suggestion sent successfully"}, status=200
+        )
     except KeyError as e:
         logging.error(f"A KeyError occurred: {str(e)}")
         return JsonResponse({"error": str(e)}, status=500)

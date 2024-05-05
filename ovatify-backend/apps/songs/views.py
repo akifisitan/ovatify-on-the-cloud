@@ -9,24 +9,18 @@ from django.views.decorators.csrf import csrf_exempt
 import spotipy
 from OVTF_Backend.firebase_auth import token_required
 from apps.songs.utils import (
-    bulk_get_or_create,
-    flush_database,
     get_artist_bio,
     get_genres_and_artist_info,
     getFirstRelatedSong,
     serializeSongMinimum,
 )
 from songs.models import (
-    Instrument,
     Mood,
     RecordedEnvironment,
     Song,
     Artist,
     Album,
-    ArtistSong,
-    AlbumSong,
     Genre,
-    GenreSong,
     Tempo,
     Playlist,
     PlaylistSong,
@@ -41,7 +35,7 @@ from django.contrib.postgres.search import (
 )
 
 
-# Create your views here.
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -191,7 +185,7 @@ def add_song(request, userid):
         if request.method != "POST":
             return JsonResponse({"error": "Invalid method"}, status=400)
         else:
-            data = json.loads(request.body, encoding="utf-8")
+            data = json.loads(request.body.decode("utf-8"))
             spotify_id = data.get(
                 "spotify_id"
             )  # Add this line to get Spotify ID from the request
