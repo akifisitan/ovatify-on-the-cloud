@@ -25,12 +25,11 @@ def token_required(view_func):
     def _wrapped_view(request, *args, **kwargs):
         if "HTTP_AUTHORIZATION" not in request.META:
             return JsonResponse({"error": "No token provided"}, status=401)
-        else:
-            auth_header = request.META.get("HTTP_AUTHORIZATION")
-            token = auth_header.split(" ", 1)
-            userid = validate_token(token[1])
-            if userid is None:
-                return JsonResponse({"error": "Invalid credentials"}, status=401)
-            return view_func(request, userid, *args, **kwargs)
+        auth_header = request.META.get("HTTP_AUTHORIZATION")
+        token = auth_header.split(" ", 1)
+        userid = validate_token(token[1])
+        if userid is None:
+            return JsonResponse({"error": "Invalid credentials"}, status=401)
+        return view_func(request, userid, *args, **kwargs)
 
     return _wrapped_view
