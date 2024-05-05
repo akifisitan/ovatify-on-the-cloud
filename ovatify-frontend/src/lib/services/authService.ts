@@ -1,3 +1,4 @@
+import { resetUserData } from "$lib/stores/userData";
 import * as api from "$lib/utils/api";
 
 export async function createUser(body: {
@@ -21,5 +22,6 @@ export async function verifyToken(token: string) {
 }
 
 export function signOut() {
-	localStorage.removeItem("token");
+	localStorage.removeItem("accessToken");
+	resetUserData();
 }

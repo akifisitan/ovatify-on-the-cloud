@@ -1,7 +1,6 @@
-import { env } from "$env/dynamic/public";
+import { PUBLIC_BASE_URL } from "$env/static/public";
 
-const local = false;
-const base = !local ? env.PUBLIC_BASE_URL ?? "" : "http://127.0.0.1:8000";
+const base = PUBLIC_BASE_URL;
 
 type SendParams = {
 	method: "GET" | "POST" | "PUT" | "DELETE";
