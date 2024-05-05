@@ -6,18 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('songs', '0009_remove_album_release_date_album_release_year'),
+        ("songs", "0009_remove_album_release_date_album_release_year"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='album',
-            name='release_year'
-        ),
+        migrations.RemoveField(model_name="album", name="release_year"),
         migrations.AddField(
-            model_name='album',
-            name='release_year',
-            field=models.PositiveIntegerField(blank=True,
-                                              default=2020),
+            model_name="album",
+            name="release_year",
+            field=models.PositiveIntegerField(blank=True, default=2020),
         ),
     ]

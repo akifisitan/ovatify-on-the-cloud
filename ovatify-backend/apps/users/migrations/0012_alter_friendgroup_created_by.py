@@ -7,13 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0011_alter_userpreferences_data_processing_consent_and_more'),
+        ("users", "0011_alter_userpreferences_data_processing_consent_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='friendgroup',
-            name='created_by',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.PROTECT, related_name='%(app_label)s_%(class)s_created_by', to='users.user', verbose_name='Created By'),
+            model_name="friendgroup",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="%(app_label)s_%(class)s_created_by",
+                to="users.user",
+                verbose_name="Created By",
+            ),
         ),
     ]

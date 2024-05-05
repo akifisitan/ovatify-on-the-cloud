@@ -4,5 +4,5 @@ AppConfig.default = False
 
 
 class UsersConfig(AppConfig):
-    name = 'users'
-    label = 'users'
+    name = "users"
+    label = "users"

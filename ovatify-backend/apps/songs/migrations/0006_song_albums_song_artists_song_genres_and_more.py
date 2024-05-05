@@ -6,28 +6,30 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('songs', '0005_alter_album_img_url_alter_artist_img_url_and_more'),
+        ("songs", "0005_alter_album_img_url_alter_artist_img_url_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='song',
-            name='albums',
-            field=models.ManyToManyField(through='songs.AlbumSong', to='songs.album'),
+            model_name="song",
+            name="albums",
+            field=models.ManyToManyField(through="songs.AlbumSong", to="songs.album"),
         ),
         migrations.AddField(
-            model_name='song',
-            name='artists',
-            field=models.ManyToManyField(through='songs.ArtistSong', to='songs.artist'),
+            model_name="song",
+            name="artists",
+            field=models.ManyToManyField(through="songs.ArtistSong", to="songs.artist"),
         ),
         migrations.AddField(
-            model_name='song',
-            name='genres',
-            field=models.ManyToManyField(through='songs.GenreSong', to='songs.genre'),
+            model_name="song",
+            name="genres",
+            field=models.ManyToManyField(through="songs.GenreSong", to="songs.genre"),
         ),
         migrations.AddField(
-            model_name='song',
-            name='instruments',
-            field=models.ManyToManyField(through='songs.InstrumentSong', to='songs.instrument'),
+            model_name="song",
+            name="instruments",
+            field=models.ManyToManyField(
+                through="songs.InstrumentSong", to="songs.instrument"
+            ),
         ),
     ]

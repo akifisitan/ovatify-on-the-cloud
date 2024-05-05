@@ -11,56 +11,104 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('songs', '0001_initial'),
+        ("songs", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Instrument',
+            name="Instrument",
             fields=[
-                ('instrument_id', models.AutoField(primary_key=True, serialize=False)),
-                ('instrument_type', models.CharField(max_length=100)),
-                ('instrument_name', models.CharField(max_length=100)),
+                ("instrument_id", models.AutoField(primary_key=True, serialize=False)),
+                ("instrument_type", models.CharField(max_length=100)),
+                ("instrument_name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('firebase_uid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('username', models.CharField(max_length=150)),
-                ('email', models.EmailField(max_length=254, unique=True)),
-                ('date_joined', models.DateTimeField(default=django.utils.timezone.now)),
-                ('last_login', models.DateTimeField()),
+                (
+                    "firebase_uid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("username", models.CharField(max_length=150)),
+                ("email", models.EmailField(max_length=254, unique=True)),
+                (
+                    "date_joined",
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                ("last_login", models.DateTimeField()),
             ],
         ),
         migrations.CreateModel(
-            name='UserSongRating',
+            name="UserSongRating",
             fields=[
-                ('rating_id', models.AutoField(primary_key=True, serialize=False)),
-                ('rating', models.DecimalField(decimal_places=2, max_digits=3)),
-                ('date_rated', models.DateTimeField(default=django.utils.timezone.now)),
-                ('song', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='songs.song')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.user')),
+                ("rating_id", models.AutoField(primary_key=True, serialize=False)),
+                ("rating", models.DecimalField(decimal_places=2, max_digits=3)),
+                ("date_rated", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "song",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="songs.song"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="users.user"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='UserPreferences',
+            name="UserPreferences",
             fields=[
-                ('preference_id', models.AutoField(primary_key=True, serialize=False)),
-                ('data_processing_consent', models.BooleanField()),
-                ('data_sharing_consent', models.BooleanField()),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='users.user')),
+                ("preference_id", models.AutoField(primary_key=True, serialize=False)),
+                ("data_processing_consent", models.BooleanField()),
+                ("data_sharing_consent", models.BooleanField()),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="users.user"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Friend',
+            name="Friend",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('friend', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='friend', to='users.user')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user', to='users.user')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "friend",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="friend",
+                        to="users.user",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="user",
+                        to="users.user",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('user', 'friend')},
+                "unique_together": {("user", "friend")},
             },
         ),
     ]

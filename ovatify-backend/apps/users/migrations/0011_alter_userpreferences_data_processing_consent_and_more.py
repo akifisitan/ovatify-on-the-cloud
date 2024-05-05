@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0010_friendrequest'),
+        ("users", "0010_friendrequest"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userpreferences',
-            name='data_processing_consent',
+            model_name="userpreferences",
+            name="data_processing_consent",
             field=models.BooleanField(default=True),
         ),
         migrations.AlterField(
-            model_name='userpreferences',
-            name='data_sharing_consent',
+            model_name="userpreferences",
+            name="data_sharing_consent",
             field=models.BooleanField(default=True),
         ),
     ]

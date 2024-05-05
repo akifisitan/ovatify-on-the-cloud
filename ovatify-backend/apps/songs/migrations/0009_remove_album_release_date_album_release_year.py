@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('songs', '0008_rename_title_album_name'),
+        ("songs", "0008_rename_title_album_name"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='album',
-            name='release_date',
+            model_name="album",
+            name="release_date",
         ),
         migrations.AddField(
-            model_name='album',
-            name='release_year',
+            model_name="album",
+            name="release_year",
             field=models.DateField(blank=True, null=True),
         ),
     ]
