@@ -97,7 +97,6 @@
 		const response = await deleteUserFromDatabase(token);
 		if (response.status === 204) {
 			signOut();
-			resetUserData();
 			displayToast({
 				type: "success",
 				message: "Account deleted successfully"
