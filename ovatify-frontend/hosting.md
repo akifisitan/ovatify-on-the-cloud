@@ -17,6 +17,12 @@ pnpm run build
 1. Run
 
 ```bash
+sudo a2enmod rewrite
+```
+
+Then
+
+```bash
 sudo vim /etc/apache2/apache2.conf
 ```
 

@@ -7,22 +7,26 @@
 - Docker
 
 Create a virtual environment and activate it
+
 ```bash
 python -m venv venv
 .\venv\Scripts\activate
 ```
 
 Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 Run the server
+
 ```bash
 python manage.py runserver
 ```
 
 Update/apply migrations
+
 ```bash
 python manage.py makemigrations
 python manage.py migrate
@@ -39,27 +43,31 @@ europe-west-3 => frankfurt
 
 ### Local
 
-Install Docker
+Install Docker, then run
 
 ```bash
 docker run -d --name pg -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=<your-password> -p 5432:5432 postgres
 ```
 
+Install psql cli tool, then run
+
 ### Connect to database instance
 ```bash
-psql -h 35.198.162.10 -U postgres -d postgres -p 5432
+psql -h <hostname> -U postgres -d postgres -p 5432
 ```
+
 Enter the password and connect
 
 ### Create new database
 Once connected, create a new database
+
 ```sql
-> CREATE DATABASE ovatify;
+CREATE DATABASE ovatify;
 ```
 Run the following to restore database from a backup file
 
 ```bash
-psql -h 35.198.162.10 -U postgres -d ovatify -f backup.sql
+psql -h <hostname> -U postgres -d ovatify -f backup.sql
 ```
 
 ## Backend Setup
