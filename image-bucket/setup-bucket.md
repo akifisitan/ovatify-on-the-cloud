@@ -84,3 +84,24 @@ psql -U postgres -d ovatify -c "COPY (SELECT id, img_url FROM songs_song) TO STD
 4. Also make sure that the script can see your JSON and CSV files (put them under the same folder with python script)
 
 5. Run the script. This should upload the images under a folder named "images" to the bucket provided. Change *__destination_blob_name__* to change or remove the directory in cloud storage.
+
+
+
+# Updating Image URLs of the Database
+
+### Steps
+
+1. Firstly, connect to your database. 
+
+```bash
+psql -U postgres -d ovatify
+```
+
+2. Run the following query:
+- *__IMPORTANT!__* Please make sure that you change the _bucket-name_ part of the URL with your real bucket name. Also this query assumes your images are under the folder named *__images__*. If you've changed the directory while running the Python script, please give the correct path according to your bucket config.
+```bash
+UPDATE songs_song
+SET img_url = CONCAT('https://storage.cloud.google.com/bucket-name/images/', id, '.jpg')
+WHERE id = '<id_value>';
+```
+This updates the img_url field for all songs to refer to your bucket.
