@@ -22,6 +22,6 @@ RUN set -ex && \
     rm -rf /root/.cache/
 COPY . /code
 
-EXPOSE 8000
+EXPOSE 6000
 
-CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "auth_service.wsgi"]
+CMD ["gunicorn", "--bind", ":6000", "--workers", "2", "auth_service.wsgi"]
