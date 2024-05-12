@@ -23,17 +23,15 @@ docker run -d --name api-gateway -p 5000:80 api-gateway-nginx
 
 ## VM Setup Instructions
 
-Run
+Install nginx and make
 
 ```bash
 sudo apt update && sudo apt install nginx -y && sudo apt install make
 ```
 
-to install nginx and make.
+Clone this directory somewhere then cd into it
 
-Copy the `vm-api-gateway` directory somewhere then cd into it
-
-Run
+Run `copy` command from makefile
 
 ```bash
 make copy
