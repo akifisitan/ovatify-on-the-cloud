@@ -4,6 +4,7 @@ copy:
 	sudo cp service_config/auth_service_routes.conf /etc/nginx/conf.d/auth_service.conf
 	sudo cp service_config/recommendation_service_routes.conf /etc/nginx/conf.d/recommendation_service.conf
 	sudo cp service_config/user_service_routes.conf /etc/nginx/conf.d/user_service.conf
+	sudo cp service_config/mono_service_routes.conf /etc/nginx/conf.d/mono_service.conf
 	sudo nginx -t
 	sudo systemctl reload nginx
 
