@@ -4,9 +4,6 @@ from users import views
 
 urlpatterns = [
     path("get-all/", view=views.get_all_users, name="get-all-users"),
-    path("create-user/", view=views.create_user, name="create-user"),
-    path("login/", view=views.login, name="login"),
-    path("delete-user/", view=views.delete_user, name="delete-user"),
     path("update-user/", view=views.update_user, name="update-user"),
     path(
         "user-preferences/",
@@ -103,37 +100,11 @@ urlpatterns = [
     ),
     path("delete-request/", view=views.delete_request, name="delete-request"),
     path(
-        "edit-user-preferences/",
-        view=views.edit_user_preferences,
-        name="edit_user_preferences",
-    ),
-    path(
-        "recommend-you-might-like/",
-        view=views.recommend_you_might_like,
-        name="recommend-you-might-like",
-    ),
-    path("get-user-profile/", view=views.get_user_profile, name="get-user-profile"),
-    path(
         "get-recent-addition-counts/",
         view=views.get_recent_addition_by_count,
         name="get-recent-addition-count",
     ),
     path("get-profile-stats/", view=views.get_profile_stats, name="get-profile-stats"),
-    path(
-        "recommend-since-you-like/",
-        view=views.recommend_since_you_like,
-        name="recommend-since-you-like",
-    ),
-    path(
-        "recommend-friend-mix/",
-        view=views.recommend_friend_mix,
-        name="recommend-friend-mix",
-    ),
-    path(
-        "recommend-friend-listen/",
-        view=views.recommend_friend_listen,
-        name="recommend-friend-listen",
-    ),
     path("export-by-genre/", views.export_by_genre, name="export-by-genre"),
     path("export-by-artist/", views.export_by_artist, name="export-by-artist"),
     path(
