@@ -8,12 +8,6 @@ copy:
 	sudo nginx -t
 	sudo systemctl reload nginx
 
-update:
-	sudo cp proxy.conf /etc/nginx/sites-available/proxy.conf
-	sudo cp nginx.conf /etc/nginx/nginx.conf
-	sudo nginx -t
-	sudo systemctl reload nginx
-
 reload:
 	sudo systemctl reload nginx
 
