@@ -1,13 +1,21 @@
 from collections import Counter
 import json
-
+from google.cloud import storage
 import math
 import random
 from django.core import serializers
 
 from songs.models import Mood, Tempo, Genre, Song, Artist
 from users.models import User, FriendGroup
+from dotenv import load_dotenv
+import os
+load_dotenv()
+CREDENTIALS_FILE = 'credentials.json'
+STORAGE_BUCKET_NAME = os.getenv("STORAGE_BUCKET_NAME")
+PROJECT_ID = os.getenv("PROJECT_ID")
 
+storage_client = storage.Client.from_service_account_json(CREDENTIALS_FILE, project=PROJECT_ID)
+bucket = storage_client.bucket(STORAGE_BUCKET_NAME)
 
 def getFavoriteSongs(userid: str, number_of_songs: int):
     if number_of_songs < -1 or number_of_songs == 0:
@@ -303,3 +311,15 @@ def serializeFriendGroupExtended(friend_group: FriendGroup):
             for member in friend_group.friends.all()
         ],
     }
+
+
+def upload_image_to_bucket(image_data, destination_blob_name):
+    try:
+        blob = bucket.blob(destination_blob_name)
+        # Upload the image data to Google Cloud Storage
+        blob.upload_from_string(image_data, content_type='image/jpeg')
+        print(f"Uploaded {destination_blob_name} successfully to bucket {STORAGE_BUCKET_NAME}")
+        return True
+    except Exception as e:
+        print(f"Failed to upload image to bucket: {str(e)}")
+        return False

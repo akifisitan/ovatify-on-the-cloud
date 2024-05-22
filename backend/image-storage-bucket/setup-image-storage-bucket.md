@@ -14,6 +14,8 @@
 
 ## Service Account Setup
 
+### Steps
+
 1. From GCP Console, choose "IAM & Admin", then select "Service Accounts" tab
 
 2. Click "Create Service Account", give it a name
@@ -39,13 +41,13 @@ These steps assume the Google Cloud SQL Database has been setup and restored fol
 1. Connect to database instance
 
 ```bash
-psql -h <hostname> -U postgres -d postgres -p 5432
+psql -h <hostname> -U postgres -d ovatify
 ```
 
 2. Extract the song id and image URL's to a csv file
 
 ```bash
-psql -U postgres -d ovatify -c "COPY (SELECT id, img_url FROM songs_song) TO STDOUT WITH (FORMAT CSV, HEADER);" > "\path\to\file\song_data.csv"
+psql -h <hostname> -U postgres -d ovatify -c "COPY (SELECT id, img_url FROM songs_song) TO STDOUT WITH (FORMAT CSV, HEADER);" > "\path\to\file\song_data.csv"
 ```
 
 ## Uploading Images to Cloud Bucket
@@ -67,7 +69,7 @@ psql -U postgres -d ovatify -c "COPY (SELECT id, img_url FROM songs_song) TO STD
 1. Connect to your database.
 
 ```bash
-psql -U postgres -d ovatify
+psql -h <hostname> -U postgres -d ovatify
 ```
 
 2. Run the following query:
@@ -75,9 +77,9 @@ psql -U postgres -d ovatify
 - _**IMPORTANT!**_ Please make sure that you change the _bucket-name_ part of the URL with your real bucket name. Also this query assumes your images are under the folder named _**images**_. If you've changed the directory while running the Python script, please give the correct path according to your bucket config.
 
 ```bash
-UPDATE songs_song
-SET img_url = CONCAT('https://storage.cloud.google.com/bucket-name/images/', id, '.jpg')
-WHERE id = '<id_value>';
+UPDATE songs_song SET img_url = 'https://storage.cloud.google.com/bucket-name/images/' || id || '.jpg';
+
 ```
 
+*Make sure to change __bucket-name__ in the query above to your actual bucket name*.
 This updates the img_url field for all songs to refer to your bucket.

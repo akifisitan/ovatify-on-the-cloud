@@ -9,4 +9,5 @@ urlpatterns = [
         view=views.edit_user_preferences,
         name="edit_user_preferences",
     ),
+    path("edit-user-image/", view=views.edit_user_image, name="edit_user_image"),
 ]
