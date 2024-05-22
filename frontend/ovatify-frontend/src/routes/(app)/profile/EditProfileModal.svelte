@@ -124,6 +124,7 @@
 				<ChooseImageModal
 					on:selectImage={(e) => {
 						imageUrl = e.detail;
+						$userData.img_url = imageUrl;
 					}}
 				/>
 			</div>
