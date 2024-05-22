@@ -135,4 +135,4 @@ GitHub.sublime-settings
 
 .DS_Store
 
-*.sql
+credentials.json

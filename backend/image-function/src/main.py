@@ -39,9 +39,7 @@ def compress_and_check_image(request):
         if safe_search_result["flagged"]:
             return 'Image contains inappropriate content.', 400
 
-        base64_encoded_image = base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
-        # Return JSON response
-        return jsonify({"image": base64_encoded_image}), 200
+        return (img_byte_arr.read(), 200, {'Content-Type': 'image/jpeg'})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
