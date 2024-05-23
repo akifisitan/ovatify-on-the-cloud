@@ -64,7 +64,7 @@ This command will:
 - Check if the nginx config has any syntax errors
 - Restart the nginx service
 
-## Seting up API Gateway using Docker
+## Optional: Setting up API Gateway using Docker
 
 1. Ensure all the services are hosted.
 
