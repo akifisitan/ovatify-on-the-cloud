@@ -1,117 +1,87 @@
-# Monolith Setup Instructions
+# Monolithic Backend Setup Instructions
 
-## Local Development Setup
+## Creating a repository in artifact registry to push the docker image
 
-### Requirements
+1. Navigate to [Artifact Registry Console](https://console.cloud.google.com/artifacts)
 
-- Python 3.11
-- Docker
+2. Click create repository
 
-Create a virtual environment and activate it
+3. Give it a name, select Docker as format, select the region and click create
 
-```bash
-python -m venv venv
-.\venv\Scripts\activate
-```
+4. Once created, click on it and copy its url. Make sure to note it down
 
-Install dependencies
+5. Click on setup instructions and copy the Configure Docker command, then run it
 
-```bash
-pip install -r requirements.txt
-```
+6. Now you will be able to push the image to this registry
 
-Run the server
+Example:
 
 ```bash
-python manage.py runserver
+gcloud auth configure-docker europe-west1-docker.pkg.dev
 ```
 
-Update/apply migrations
+## Building the docker image and pushing it to a repository to use on Google Cloud Run
+
+1. Install Docker
+
+2. Navigate to the source code where the Dockerfile is
+
+3. Run
 
 ```bash
-python manage.py makemigrations
-python manage.py migrate
+docker build -t <image-name> .
 ```
 
-## Google Cloud Setup
-
-install google cloud cli from
-https://cloud.google.com/sdk/docs/install
-
-europe-west-3 => frankfurt
-
-## Database Setup
-
-### Local
-
-Install Docker, then run
-
-```bash
-docker run -d --name pg -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=<your-password> -p 5432:5432 postgres
-```
-
-Install psql cli tool, then run
-
-### Connect to database instance
-
-```bash
-psql -h <hostname> -U postgres -d postgres -p 5432
-```
-
-Enter the password and connect
-
-### Create new database
-
-Once connected, create a new database
-
-```sql
-CREATE DATABASE ovatify;
-```
-
-Run the following to restore database from a backup file
-
-```bash
-psql -h <hostname> -U postgres -d ovatify -f backup.sql
-```
-
-## Backend Setup
-
-Build the image locally with
+Example:
 
 ```bash
 docker build -t ovatify-backend .
 ```
 
-Run the image locally with
+4. Once it is built, tag the image with the repository url you noted down
 
 ```bash
-docker run -d --name ovatify --env-file .env -p 8000:8000 ovatify-backend
+docker tag <service-image-name> <repository-url>/<image-name>
 ```
 
-Create new docker artifact registry from the [google artifact dashboard](https://console.cloud.google.com/artifacts)
-
-- Choose Docker as the format and Standard as the mode.
-- Under Location Type, select Region and then choose the location europe-west-3
-
-Configure auth for the registry you have created
+Example:
 
 ```bash
-gcloud auth configure-docker europe-west3-docker.pkg.dev
+docker tag ovatify-backend europe-west1-docker.pkg.dev/my-project-name/my-test-registry/ovatify-backend
 ```
 
-Tag the local image with the registry
+5. Push the tagged image to the repository with
 
 ```bash
-docker tag ovatify-backend europe-west3-docker.pkg.dev/ascendant-bloom-417021/test-registry/ovatify-backend
+docker push <repository-url>/<image-name>
 ```
-
-Push the image to the registry with
 
 ```bash
-docker push europe-west3-docker.pkg.dev/ascendant-bloom-417021/test-registry/ovatify-backend
+docker push europe-west1-docker.pkg.dev/my-project-name/my-test-registry/ovatify-backend
 ```
 
-# Steps
+## Creating Google Cloud Run Services
 
-1. Open up Cloud SQL Postgres 15 instance with 1vCPU 614.4 MB 10 GB SSD 0.02$/hour [show](https://console.cloud.google.com/sql/instances/pg/edit?hl=en&organizationId=1045832606744&project=ascendant-bloom-417021)
-2. Setup Cloud Run from Artifact Registry
+1. Ensure the image is pushed to the image repository
+
+2. Navigate to the [Google Cloud Run Console](https://console.cloud.google.com/run)
+
+3. Click on create service
+
+4. Click on "Select" to select the container image URL, then select the image of the service you wish
+
+5. Set service name and region
+
+6. Check "Allow unauthenticated invocations"
+
+7. Modify CPU and scaling parameters as necessary
+
+8. Click on Container(s), Volumes, Networking, Security. Set the container port to 8000, modify memory and cpu as necessary
+
+9. Click on Variables & Secrets, then add the required environment variables specified in the `.env.example` file
+
+10. Modify the request timeout, max concurrent requests per instance, min and max number of instances as necessary
+
+11. Click create
+
+12. Once created, copy the service URL. Make sure to note it down
