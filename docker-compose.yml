@@ -1,0 +1,89 @@
+volumes:
+  postgresqlvolume:
+
+
+services:
+  database:
+    image: postgres:15
+    volumes:
+      - postgresqlvolume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ovatify
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Test123.
+    ports:
+      - "5432:5432"
+
+  auth_service:
+    build:
+      context: ./backend/microservices/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "6001:8000"
+    depends_on:
+      - database
+    env_file:
+      - ./backend/microservices/auth-service/.env.local
+
+  recommendation_service:
+    build:
+      context: ./backend/microservices/recommendation-service
+      dockerfile: Dockerfile
+    ports:
+      - "6002:8000"
+    depends_on:
+      - database
+    env_file:
+      - ./backend/microservices/recommendation-service/.env.local
+
+  user_service:
+    build:
+      context: ./backend/microservices/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "6003:8000"
+    depends_on:
+      - database
+    env_file:
+      - ./backend/microservices/user-service/.env.local
+
+  mono_service:
+    build:
+      context: ./backend/microservices/mono-service
+      dockerfile: Dockerfile
+    ports:
+      - "6004:8000"
+    depends_on:
+      - database
+    env_file:
+      - ./backend/microservices/mono-service/.env.local
+
+  api_gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - auth_service
+      - recommendation_service
+      - user_service
+      - mono_service
+
+  frontend:
+    build:
+      context: ./frontend/ovatify-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+      - api_gateway
+
+  load_generator:
+    build:
+      context: ./load-generator
+      dockerfile: Dockerfile
+    ports:
+      - "7000:8089"
+    depends_on:
+      - frontend

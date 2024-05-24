@@ -6,17 +6,21 @@
 
 2. Click "Create" to create a new bucket
 
-3. Give your bucket a name, choose "Region" for storing the data with low cost (europe-west1 Belgium can be chosen)
+3. Give your bucket a name. Make sure to note it down
 
-4. Leave storage class, controlled access and protect settings default
+4. Choose "Region" for storing the data with low cost (europe-west1-belgium is preferred)
 
-5. A pop-up will appear, UNCHECK the box for "Enforce public access prevention on this bucket"
+5. Leave storage class, controlled access and protect settings as default
+
+6. A pop-up will appear, UNCHECK the box for "Enforce public access prevention on this bucket"
+
+7. Once it is created, navigate to permissions
+
+8. Grant access to allUsers and assign the `Storage Object Viewer` role, then click save
 
 ## Service Account Setup
 
-### Steps
-
-1. From GCP Console, choose "IAM & Admin", then select "Service Accounts" tab
+1. Navigate to [Service Accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) (From GCP Console, choose "IAM & Admin", then select "Service Accounts" tab)
 
 2. Click "Create Service Account", give it a name
 
@@ -32,7 +36,7 @@
 
 6. Click _"Add Key"_, and then _"Create new key"_, choose JSON and create
 
-7. A JSON file with your credentials should begin to download.
+7. JSON file with your credentials should have been downloaded, store it somewhere safe
 
 ## Extracting image urls from the database
 
@@ -81,5 +85,5 @@ UPDATE songs_song SET img_url = 'https://storage.cloud.google.com/bucket-name/im
 
 ```
 
-*Make sure to change __bucket-name__ in the query above to your actual bucket name*.
+_Make sure to change **bucket-name** in the query above to your actual bucket name_.
 This updates the img_url field for all songs to refer to your bucket.

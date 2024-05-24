@@ -1,6 +1,6 @@
 # Frontend VM Setup Instructions
 
-These steps assume a fresh installation of Ubuntu 22.04
+These steps assume the [API gateway setup](../../backend/api-gateway/setup-api-gateway.md) has been followed and that a new VM with a fresh installation of Ubuntu 22.04 has been created.
 
 1. Install node
 
@@ -36,7 +36,7 @@ git clone https://github.com/akifisitan/ovatify-on-the-cloud-public-files.git &&
 cp .env.example .env
 ```
 
-5. Update the base url if necessary
+5. Update the base url to `http://<api-gateway-VM-ip>` Ex: http://35.43.33.102
 
 ```bash
 vim .env

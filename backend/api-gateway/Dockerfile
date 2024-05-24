@@ -5,7 +5,7 @@ FROM nginx:latest
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copy config file
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx-docker.conf /etc/nginx/nginx.conf
 
 # Copy shared proxy settings
 COPY location_proxy_shared.conf /etc/nginx/conf.d/location_proxy_shared.conf
