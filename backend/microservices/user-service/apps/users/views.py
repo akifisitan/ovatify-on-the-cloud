@@ -1,21 +1,24 @@
 import json
 import logging
-from django.http import JsonResponse, HttpResponse
+import os
+import uuid
+
+import requests
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from dotenv import load_dotenv
+from google.cloud import storage
 from user_service.firebase_auth import token_required
 from users.models import User, UserPreferences
-import requests
-from google.cloud import storage
-from dotenv import load_dotenv
-import os
-
 from users.utils import upload_image_to_bucket
 
+logger = logging.getLogger(__name__)
+
 load_dotenv()
+
 cloud_function_url = os.getenv("CLOUD_FUNCTION_URL")
 bucket_name = os.getenv("STORAGE_BUCKET_NAME")
-base_url = f'https://storage.cloud.google.com/{bucket_name}/'
-logger = logging.getLogger(__name__)
+base_url = f"https://storage.googleapis.com/{bucket_name}/"
 
 
 @csrf_exempt
@@ -132,40 +135,43 @@ def edit_user_preferences(request, user_id):
 @csrf_exempt
 @token_required
 def edit_user_image(request, user_id):
-    if request.method != 'POST':
+    if request.method != "POST":
         return JsonResponse({"error": "Only POST method is accepted"}, status=405)
 
         # Check if the image part is present in the POST request
-    if 'image' not in request.FILES:
+    if "image" not in request.FILES:
         return JsonResponse({"error": "No image file provided"}, status=400)
 
-    image_file = request.FILES['image']
-    if image_file.name == '':
+    image_file = request.FILES["image"]
+    if image_file.name == "":
         return JsonResponse({"error": "No selected file"}, status=400)
-    print("Image file received")
+
     # Send the image to the GCP AI service
-    files = {'image': image_file}
     try:
-        response = requests.post(url=cloud_function_url, files=files)
+        response = requests.post(url=cloud_function_url, files={"image": image_file})
         # Check response from AI service
-        print(response.status_code)
         if response.status_code == 400:
-            return JsonResponse({"error": "Image contains inappropriate content"}, status=400)
+            return JsonResponse(
+                {"error": "Image contains inappropriate content"}, status=400
+            )
         if response.status_code == 200:
-            destination_blob_name = f'users/{user_id}.jpeg'
+            destination_blob_name = f"users/images/{str(uuid.uuid4())}.jpeg"
             success = upload_image_to_bucket(response.content, destination_blob_name)
-            if success:
-                #save the user image url
-                user = User.objects.get(id=user_id)
-                user.img_url = f'{base_url}{destination_blob_name}'
-                user.save()
-                return JsonResponse({"message": "Profile picture changed successfully"}, status=200)
-            return JsonResponse({"error": "An error occurred while uploading the image"}, status=500)
+            if not success:
+                return JsonResponse(
+                    {"error": "An error occurred while uploading the image"}, status=500
+                )
+            # save the user image url
+            user = User.objects.get(id=user_id)
+            user.img_url = f"{base_url}{destination_blob_name}"
+            user.save()
+            return JsonResponse(
+                {"message": "Profile picture changed successfully"}, status=200
+            )
+        return JsonResponse(
+            {"message": "An error occurred while uploading the image"}, status=500
+        )
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        #return error message with e as the error message
+        logging.error(f"An error occurred: {str(e)}")
+        # return error message with e as the error message
         return JsonResponse({"error": str(e)}, status=500)
-
-
-
-
