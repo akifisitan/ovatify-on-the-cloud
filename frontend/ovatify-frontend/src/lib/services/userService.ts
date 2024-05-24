@@ -1,5 +1,4 @@
 import * as api from "$lib/utils/api";
-import { sleep } from "$lib/utils/time";
 
 export async function getRecentlyAddedSongs(token: string, numberOfSongs: number | null) {
 	const response = await api.get(
@@ -118,12 +117,6 @@ export async function deleteUserFromDatabase(token: string) {
 }
 
 export async function editUserImage(token: string, image: File) {
-	await sleep(2);
-	return {
-		status: 201,
-		data: null,
-		error: null
-	};
 	const form = new FormData();
 	form.append("image", image);
 	const response = await api.post("users/edit-user-image/", token, null, form);

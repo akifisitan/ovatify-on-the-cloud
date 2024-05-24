@@ -49,8 +49,9 @@
 		const token = $userData.token!;
 		const response = await editUserImage(token, image!);
 		console.log(response);
-		if (response.status === 201) {
+		if (response.status === 200) {
 			displayToast({ type: "success", message: "Image updated successfully" });
+			dispatch("selectImage", URL.createObjectURL(image!));
 		} else if (response.status === 400) {
 			displayToast({
 				type: "error",
@@ -59,7 +60,6 @@
 		} else {
 			displayToast({ type: "error", message: "Error updating image" });
 		}
-		dispatch("selectImage", URL.createObjectURL(image!));
 		dialogOpen = false;
 		loading = false;
 		image = null;
