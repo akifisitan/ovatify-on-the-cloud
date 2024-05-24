@@ -12,13 +12,13 @@ _**!IMPORTANT!**_ For this to work properly, you must enable the [Cloud Vision A
 
 3. Choose a name and region for the serverless function to be run (Belgium is preferred)
 
-4. Leave trigger type as default and check _**allow for unauthenticated invocations**_
+4. Leave trigger type as default and check `Allow unauthenticated invocations`
 
 5. Adjust Runtime etc. according to your needs
    (_**Concurrency and number of instances are important**_)
 
 6. Click Next
 
-7. You should see the function creation screen now. Choose Runtime as _**Python 3.11**_, entry point as _**compress_and_check_image**_, and change _**main.py**_ and _**requirements.txt**_ with the files provided under _**src**_ folder in this directory
+7. You should see the function creation screen now. Choose `Python 3.11` as runtime from the dropdown , modify the entry point to `compress_and_check_image`, and update `main.py` and `requirements.txt` with the files provided under the [src folder](./src/) in this directory
 
-8. Click deploy, you will be given the access URL for the Function that will be accessible by any HTTP request.
+8. Click deploy, then copy the access URL for the function. Make sure to note it down
