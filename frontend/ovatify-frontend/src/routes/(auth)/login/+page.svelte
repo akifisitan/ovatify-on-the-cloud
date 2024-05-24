@@ -69,7 +69,7 @@
 			<Icons.logoWithText />
 		</div>
 		<div
-			class="flex border-2 bg-[#1D1F26] text-[#B3BBD8] rounded-2xl justify-center items-center
+			class="flex border-2 bg-[#1D1F26] placeholder-slate-800 text-[#B3BBD8] rounded-2xl justify-center items-center
 					 w-[20rem] xsm:w-[24rem] sm:w-[26rem] max-w-[90vw] pb-4 mt-4 mb-8"
 		>
 			<form
@@ -77,35 +77,24 @@
 				on:submit|preventDefault={handleLogin}
 			>
 				<h1 class="pt-4 text-center text-2xl font-bold">Log In</h1>
-				<div class="text-[#B3BBD8] placeholder-slate-800">
+				<div>
 					<Label for="email">Email</Label>
 					<Input
 						class="bg-black mt-1"
 						type="email"
 						id="email"
 						name="email"
-						tabindex={1}
 						placeholder="Enter your email"
 						bind:value={email}
 					/>
 				</div>
 				<div>
-					<div class="flex justify-between items-center font-medium text-sm">
-						<Label for="password">Password</Label>
-						{#if loading}
-							<p class="select-none">Forgot password?</p>
-						{:else}
-							<a href="/reset-password" class="transition hover:opacity-75" tabindex={4}
-								>Forgot password?</a
-							>
-						{/if}
-					</div>
+					<Label for="password">Password</Label>
 					<Input
 						class="bg-black mt-1"
 						type="password"
 						id="password"
 						name="password"
-						tabindex={2}
 						placeholder="Enter your password"
 						bind:value={password}
 					/>
@@ -113,7 +102,6 @@
 				<Button
 					variant={!loading ? "outline" : "secondary"}
 					type="submit"
-					tabindex={3}
 					class="font-semibold">{!loading ? "Log In" : "Logging in..."}</Button
 				>
 				<div>

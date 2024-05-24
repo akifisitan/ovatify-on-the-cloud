@@ -115,3 +115,10 @@ export async function deleteUserFromDatabase(token: string) {
 	const response = await api.del("users/delete-user/", token);
 	return response;
 }
+
+export async function editUserImage(token: string, image: File) {
+	const form = new FormData();
+	form.append("image", image);
+	const response = await api.post("users/edit-user-image/", token, null, form);
+	return response;
+}

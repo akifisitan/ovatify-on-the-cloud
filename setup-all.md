@@ -24,13 +24,22 @@
 
 1. Create a Google Cloud project and note down the project name
 
-2. [Setup the image storage bucket](./backend/image-storage-bucket/setup-image-storage-bucket.md) and note down the bucket name
+2. [Setup the image storage bucket](./backend/image-storage-bucket/setup-image-storage-bucket.md), note down the bucket name and obtain the service account credentials
 
 3. [Setup the image function](./backend/image-function/setup-image-function.md) and note down the function url
 
 4. Create an `.env.local` file in each microservice source directory
 
-Add the following to the `.env.local` file
+Add the following to the `.env.local` files inside [auth-service](./backend/microservices/auth-service/), [mono-service](./backend/microservices/mono-service/) and [recommendation-service](./backend/microservices/recommendation-service/)
+
+```txt
+DB_NAME=ovatify
+DB_USER=postgres
+DB_PASSWORD=Test123.
+DB_HOST=host.docker.internal
+```
+
+Add the following to the `env.local` file inside [user-service](./backend/microservices/user-service/)
 
 ```txt
 DB_NAME=ovatify
@@ -41,6 +50,8 @@ CLOUD_FUNCTION_URL=your-function-url-here
 STORAGE_BUCKET_NAME=your-bucket-name-here
 PROJECT_ID=your-project-id-here
 ```
+
+Rename the service account file to `credentials.json` and place it in the root directory of [user-service](./backend/microservices/user-service/)
 
 5. Create an `.env` file in `frontend/ovatify-frontend`
 

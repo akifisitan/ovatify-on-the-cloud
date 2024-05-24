@@ -10,19 +10,23 @@
 
 4. Choose "Region" for storing the data with low cost (europe-west1-belgium is preferred)
 
-5. Leave storage class, controlled access and protect settings as default
+5. Leave storage class, as default
 
-6. A pop-up will appear, UNCHECK the box for "Enforce public access prevention on this bucket"
+6. Uncheck the box for `Enforce public access prevention on this bucket`
 
-7. Once it is created, navigate to permissions
+7. Uncheck `Soft delete policy`
 
-8. Grant access to allUsers and assign the `Storage Object Viewer` role, then click save
+8. Click create. Once it is created, navigate to the `Permissions` tab
 
-## Service Account Setup
+9. Under Permissions, click `Grant access`, add allUsers as new principal and assign the `Storage Object Viewer` role, click save
+
+10. A popup will appear, click on `Allow Public Access`
+
+## Obtaining Service Account Credentials
 
 1. Navigate to [Service Accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) (From GCP Console, choose "IAM & Admin", then select "Service Accounts" tab)
 
-2. Click "Create Service Account", give it a name
+2. Select your project if its not already selected, then click "Create Service Account" and give it a name
 
 3. **IMPORTANT!** Grant 3 roles to the service account:
 
@@ -38,7 +42,7 @@
 
 7. JSON file with your credentials should have been downloaded, store it somewhere safe
 
-## Extracting image urls from the database
+## Optional - Extracting image urls from the database
 
 These steps assume the Google Cloud SQL Database has been setup and restored following the [guide](../database/setup-cloud-sql.md)
 
@@ -54,7 +58,7 @@ psql -h <hostname> -U postgres -d ovatify
 psql -h <hostname> -U postgres -d ovatify -c "COPY (SELECT id, img_url FROM songs_song) TO STDOUT WITH (FORMAT CSV, HEADER);" > "\path\to\file\song_data.csv"
 ```
 
-## Uploading Images to Cloud Bucket
+## Optional - Uploading Images to Cloud Bucket
 
 1. Make sure that you have your CSV file for song data and JSON file for credentials
 
@@ -68,7 +72,7 @@ psql -h <hostname> -U postgres -d ovatify -c "COPY (SELECT id, img_url FROM song
 
 5. Run the script. This should upload the images under a folder named "images" to the bucket provided. Change _**destination_blob_name**_ to change or remove the directory in cloud storage.
 
-## Updating Image URLs of the Database
+## Optional - Updating Image URLs of the Database
 
 1. Connect to your database.
 
