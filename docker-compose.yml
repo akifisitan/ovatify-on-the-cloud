@@ -79,3 +79,11 @@ services:
     depends_on:
       - api_gateway
 
+  load_generator:
+    build:
+      context: ./load-generator
+      dockerfile: Dockerfile
+    ports:
+      - "7000:8089"
+    depends_on:
+      - frontend

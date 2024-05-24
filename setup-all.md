@@ -28,7 +28,7 @@
 
 3. [Setup the image function](./backend/image-function/setup-image-function.md) and note down the function url
 
-Create an `.env.local` file in each microservice source directory
+4. Create an `.env.local` file in each microservice source directory
 
 Add the following to the `.env.local` file
 
@@ -42,16 +42,24 @@ STORAGE_BUCKET_NAME=your-bucket-name-here
 PROJECT_ID=your-project-id-here
 ```
 
-4. Run
+5. Create an `.env` file in `frontend/ovatify-frontend`
+
+Add the following to the `.env` file
+
+```txt
+PUBLIC_BASE_URL=http://localhost:8000
+```
+
+6. Run
 
 ```bash
 docker compose up --remove-orphans --detach
 ```
 
-5. Once the services are up and running, connect to the database and restore the backup
+7. Once the services are up and running, connect to the database and restore the backup
 
 ```bash
 psql -U postgres -d ovatify -f backend/database/backup.sql
 ```
 
-6. Access the services through the api-gateway url via `http://localhost:5000/`
+8. In your browser, navigate to `http://localhost:5000/` for the frontend app or `http://localhost:7000/` for the load generator

@@ -1,8 +1,0 @@
-# IDE
-.idea
-.vscode
-
-# Python
-venv
-.venv
-__pycache__
