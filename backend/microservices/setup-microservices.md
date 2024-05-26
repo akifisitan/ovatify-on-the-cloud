@@ -24,11 +24,13 @@ gcloud auth configure-docker europe-west1-docker.pkg.dev
 
 1. Install Docker
 
-For each service
+    For each service
 
 2. Navigate to the service source code where the Dockerfile is
 
-3. Run
+3. Create `.env` file and add needed config values written at `.env.example`
+
+4. Run
 
 ```bash
 docker build -t <service-image-name> .

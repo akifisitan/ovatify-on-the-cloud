@@ -7,6 +7,8 @@
 
 This project involves redesigning and adapting [Ovatify](https://github.com/akifisitan/ovatify), a social music platform app, into a Cloud Native application as part of the [CS436 Cloud Computing](https://suis.sabanciuniv.edu/prod/bwckctlg.p_disp_course_detail?cat_term_in=202302&subj_code_in=CS&crse_numb_in=436) course.
 
+[Project Demo Video Link](https://youtu.be/09V5-cXKohY)
+
 ## Cloud Architecture
 
 ### Frontend
