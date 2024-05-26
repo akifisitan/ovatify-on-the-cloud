@@ -20,6 +20,8 @@
 
 9. Follow the [load generator setup guide](./load-generator/setup-load-generator.md) and run tests by hitting the load balancer and API Gateway VM IP addresses
 
+9. Follow the [stress test guide](./load-generator/README.md) to see how to run tests
+
 ## Local setup with Docker Compose
 
 1. Create a Google Cloud project and note down the project name
